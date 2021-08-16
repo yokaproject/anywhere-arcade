@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <title>15 puzzle</title>
+    <link href="https://unpkg.com/sanitize.css" rel="stylesheet">
+    <link href="https://unpkg.com/sanitize.css/forms.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+  </head>
+  <body>
+    <div id="app">
+      <div id="header">
+        <h1>15 puzzle</h1>
+      </div>
+      <div id="board">
+        <p>Current moves: {{ count }}</p>
+        <table>
+          <tr v-for="row in board">
+            <td v-for="num in row" @click="clicked(num)" v-bind:class="{ free: num==0 }">{{ num }}</td>
+          </tr>
+        </table>
+      </div>
+      <div id="restart" @click="restart">
+        <p>RESTART</p>
+      </div>
+    </div>
+    <script type="text/javascript" src="js/main.js"></script>
+  </body>
+</html>
