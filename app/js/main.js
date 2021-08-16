@@ -1,63 +1,84 @@
 const size = 4;
 const tileNum = size * size;
 
-const shuffle = function([...array]) {
-  for (let i = array.length - 1; i >= 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
-}
-
-const start = function() {
-  const originalTile = []
-  for (let i = 0; i < tileNum; i++) {
-    originalTile[i] = i;
-  }
-  const shuffledTile = shuffle(originalTile);
-  let board = [];
-  for (let i = 0; i < size; i++) {
-    board[i] = shuffledTile.slice(i * size, (i + 1) * size);
-  }
-  return board
-}
-
-const startBoard = start();
-
 const vm = new Vue ({
   el: "#app",
 
   data: {
-    board: startBoard,
-    count: 0
+    board: [],
+    count: 0,
+    playing: false,
+    solved: false
   },
 
   methods: {
     start: function() {
-      const answerTile = []
-      for (let i = 0; i < tileNum; i++) {
-        answerTile[i] = i;
+      this.board.length = 0;
+      this.count = 0;
+      this.playing = true;
+      this.solved = false;
+
+      originalTileArray = []
+      for (let i = 1; i <= tileNum; i++) {
+        originalTileArray.push(i % tileNum);
       }
-      const shuffledTile = shuffle(answerTile);
-      let board = [];
+      const shuffledTileArray = this.shuffle(originalTileArray);
       for (let i = 0; i < size; i++) {
-        board[i] = shuffledTile.slice(i * size, (i + 1) * size);
+        // this.board.push(originalTileArray.slice(i * size, (i + 1) * size));
+        this.board.push(shuffledTileArray.slice(i * size, (i + 1) * size));
       }
-      return this.board = board
+    },
+    shuffle: function([...tileArray]) {
+      for (let i = tileArray.length - 1; i >= 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [tileArray[i], tileArray[j]] = [tileArray[j], tileArray[i]];
+      }
+      if (!this.isSolvable(tileArray)) {
+        tileArray.reverse();
+      }
+      return tileArray;
+    },
+    isSolvable: function(tileArray) {
+      let sum = 0;
+      for (let i = 0; i < tileNum; i++) {
+        if (tileArray[i] == 0) {
+          sum += Math.floor(i / size) + 1;
+          continue;
+        }
+        for (let j = i + 1; j < tileNum; j++) {
+          if (tileArray[i] > tileArray[j] && tileArray[j] > 0) {
+            sum++;
+          }
+        }
+      }
+      return sum % 2 == 0;
     },
     restart: function() {
-      if(confirm("Are you sure you want to restart?")) {
+      if (this.playing) {
+        if(confirm("Are you sure you want to shuffle the board?")) {
+          this.start();
+        }
+      } else {
         this.start();
-        this.count = 0;
       }
     },
     clicked: function(num) {
+      if (!this.playing) {
+        return;
+      }
       const from = this.getIndex(num, this.board);
       const row = from[0], col = from[1];
       if (this.canMove(row, col)) {
         const to = this.getIndex(0);
         this.moveTile(num, from, to);
         this.count++;
+        if (from[0] == size - 1 && from[1] == size - 1 ) {
+          if (this.isSolved(this.board)) {
+            this.playing = false;
+            this.solved = true;
+            window.setTimeout(this.alertCongrats, 100);
+          }
+        }
       }
     },
     getIndex: function(num) {
@@ -97,9 +118,29 @@ const vm = new Vue ({
       return false;
     },
     moveTile: function(num, from, to) {
-      console.log('swap');
       this.board[to[0]].splice([to[1]], 1, num);
       this.board[from[0]].splice([from[1]], 1, 0);
+    },
+    isSolved: function(board) {
+      const tileArray = board.flat();
+      for (let i = 1; i < tileNum; i++) {
+        if (tileArray[i - 1] != i) {
+          return false;
+        }
+      }
+      return true;
+    },
+    alertCongrats: function() {
+      let message = "Congrats! You solved the puzzle in ";
+      if (this.count == 1) {
+        message = message + "1 move!!";
+      } else {
+        message = message + this.count + " moves!!";
+      }
+      alert(message);
+      if (confirm("Would you like to try another puzzle?")) {
+        this.start();
+      }
     }
   }
 })

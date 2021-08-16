@@ -56,7 +56,7 @@ td {
     background-color: white;
 }
 
-#restart {
+.button {
     margin: 10vh auto;
     height: 30px;
     width: 80px;
@@ -64,7 +64,7 @@ td {
     vertical-align: middle;
 }
 
-#restart p {
+.button p {
     height: 30px;
     line-height: 30px;
     text-align: center;
