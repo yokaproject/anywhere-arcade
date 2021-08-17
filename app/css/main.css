@@ -19,6 +19,20 @@ body {
     background-color: white;
 }
 
+#settings {
+    margin: auto;
+    text-align: center;
+    color: white;
+}
+
+#settings select {
+    border-color: white;
+}
+
+#board {
+    margin-bottom: 10vh;
+}
+
 #board p {
     text-align: center;
     color: white;
@@ -57,11 +71,15 @@ td {
 }
 
 .button {
-    margin: 10vh auto;
+    margin: 5vh auto;
     height: 30px;
     width: 80px;
     background-color: white;
     vertical-align: middle;
+}
+
+.button:hover {
+    background-color: rgba(255, 255, 255, 0.7);
 }
 
 .button p {
