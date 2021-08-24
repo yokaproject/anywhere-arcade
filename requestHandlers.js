@@ -1,4 +1,3 @@
-const querystring = require("querystring");
 const fs = require('fs');
 
 const start = (response, postData) => {
@@ -12,8 +11,9 @@ const start = (response, postData) => {
     '<body>'+
     '<h1>どこでもアーケード</h1>'+
     '<h2>Anywhere Arcade</h2>'+
-    '<a href="/playFifteen">15パズルで遊ぶ</a><br>'+
-    '<a href="/playTetris">テトリスで遊ぶ</a>'+
+    '<a href="/slide">15パズルで遊ぶ</a><br>'+
+    '<a href="/tetris">テトリスで遊ぶ</a><br>'+
+    '<a href="/chat">チャット</a>'+
     '</body>'+
     '</html>';
 
@@ -22,36 +22,66 @@ const start = (response, postData) => {
     response.end();
     return 'Hello Start';
 };
-
-const playFifteen = (response, postData) => {
-    console.log('Request handler \'playFifteen\' was called');
-    fs.readFile('pages/fifteen.html', 'utf-8', (err, data) => {
+const chat = (response, postData) => {
+    console.log('Request handler \'chat\' was called');
+    fs.readFile('pages/chat.html', 'utf-8', (err, data) => {
         response.writeHead(200, {'Content-Type': 'text/html'});
         response.write(data);
         response.end();
     });
 }
-
-const playTetris = (response, postData) => {
-    console.log('Request handler \'playTetris\' was called');
+const slide = (response, postData) => {
+    console.log('Request handler \'slide\' was called');
+    fs.readFile('pages/slide.html', 'utf-8', (err, data) => {
+        response.writeHead(200, {'Content-Type': 'text/html'});
+        response.write(data);
+        response.end();
+    });
+}
+const tetris = (response, postData) => {
+    console.log('Request handler \'tetris\' was called');
     fs.readFile('pages/tetris.html', 'utf-8', (err, data) => {
         response.writeHead(200, {'Content-Type': 'text/html'});
         response.write(data);
         response.end();
     })
 }
-
-const getCss = (response, postData) => {
-    console.log('Request handler \'getCss\' was called');
-    fs.readFile('pages/style.css', 'utf-8', (err, data) => {
+const slideCss = (response, postData) => {
+    console.log('Request handler \'slideCss\' was called');
+    fs.readFile('pages/css/slide.css', 'utf-8', (err, data) => {
         response.writeHead(200, {'Content-Type': 'text/css'});
         response.write(data);
         response.end();
     });
 }
-const getJs = (response, postData) => {
-    console.log('Request handler \'getCss\' was called');
-    fs.readFile('pages/main.js', 'utf-8', (err, data) => {
+const slideJs = (response, postData) => {
+    console.log('Request handler \'slideJs\' was called');
+    fs.readFile('pages/js/slide.js', 'utf-8', (err, data) => {
+        response.writeHead(200, {'Content-Type': 'text/plain'});
+        response.write(data);
+        response.end();
+    });
+}
+const tetrisCss = (response, postData) => {
+    console.log('Request handler \'tetrisCss\' was called');
+    fs.readFile('pages/css/tetris.css', 'utf-8', (err, data) => {
+        response.writeHead(200, {'Content-Type': 'text/css'});
+        response.write(data);
+        response.end();
+    });
+}
+const tetrisJs = (response, postData) => {
+    console.log('Request handler \'tetrisJs\' was called');
+    fs.readFile('pages/js/tetris.js', 'utf-8', (err, data) => {
+        response.writeHead(200, {'Content-Type': 'text/plain'});
+        response.write(data);
+        response.end();
+    });
+}
+const socket = (response, postData) => {
+    const file = __dirname + '/node_modules/socket.io/client-dist/socket.io.js';
+    console.log('Request handler \'socket\' was called');
+    fs.readFile(file, 'utf-8', (err, data) => {
         response.writeHead(200, {'Content-Type': 'text/plain'});
         response.write(data);
         response.end();
@@ -59,7 +89,11 @@ const getJs = (response, postData) => {
 }
 
 exports.start = start;
-exports.playFifteen = playFifteen;
-exports.playTetris = playTetris;
-exports.getCss = getCss;
-exports.getJs = getJs;
+exports.chat = chat;
+exports.slide = slide;
+exports.tetris = tetris;
+exports.slideCss = slideCss;
+exports.slideJs = slideJs;
+exports.tetrisCss = tetrisCss;
+exports.tetrisJs = tetrisJs;
+exports.socket = socket;

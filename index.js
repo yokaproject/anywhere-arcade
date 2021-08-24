@@ -5,9 +5,13 @@ const requestHandlers = require("./requestHandlers");
 let handle = {};
 handle['/'] = requestHandlers.start;
 handle['/start'] = requestHandlers.start;
-handle['/playFifteen'] = requestHandlers.playFifteen;
-handle['/playTetris'] = requestHandlers.playTetris;
-handle['/style.css'] = requestHandlers.getCss;
-handle['/main.js'] = requestHandlers.getJs;
+handle['/chat'] = requestHandlers.chat;
+handle['/slide'] = requestHandlers.slide;
+handle['/tetris'] = requestHandlers.tetris;
+handle['/css/slide.css'] = requestHandlers.slideCss;
+handle['/js/slide.js'] = requestHandlers.slideJs;
+handle['/css/tetris.css'] = requestHandlers.tetrisCss;
+handle['/js/tetris.js'] = requestHandlers.tetrisJs;
+handle['/node_modules/socket.io/client-dist/socket.io.js'] = requestHandlers.socket;
 
 server.start(router.route, handle);
