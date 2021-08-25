@@ -24,11 +24,11 @@ const start = (route, handle) => {
 
   const io = require('socket.io')(server);
 
-  io.on("connection", (socket)=>{
-    console.log("Connected");
+  io.on('connection', (socket)=>{
+    console.log('Connected');
   
-    socket.on("post", (msg)=>{
-      io.emit("member-post", msg);
+    socket.on('post', (msg)=>{
+      io.emit('member-post', msg);
     });
   });
 };
