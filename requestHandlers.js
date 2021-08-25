@@ -1,27 +1,30 @@
 const fs = require('fs');
 
-const start = (response, postData) => {
-    console.log('Request handler \'start\' was called');
-
-    const body = '<html>'+
-    '<head>'+
-    '<meta http-equiv="Content-Type" content="text/html; '+
-    'charset=UTF-8" />'+
-    '</head>'+
-    '<body>'+
-    '<h1>どこでもアーケード</h1>'+
-    '<h2>Anywhere Arcade</h2>'+
-    '<a href="/slide">スライディング・パズルで遊ぶ</a><br>'+
-    '<a href="/tetris">テトリスで遊ぶ</a><br>'+
-    '<a href="/chat">チャット</a>'+
-    '</body>'+
-    '</html>';
-
-    response.writeHead(200, {'Content-Type': 'text/html'});
-    response.write(body);
-    response.end();
+const home = (response, postData) => {
+    console.log('Request handler \'home\' was called');
+    fs.readFile('pages/home.html', 'utf-8', (err, data) => {
+        response.writeHead(200, { 'Content-Type': 'text/html' });
+        response.write(data);
+        response.end();
+    });
     return 'Hello Start';
 };
+const homeCss = (response, postData) => {
+    console.log('Request handler \'homeCss\' was called');
+    fs.readFile('pages/css/home.css', 'utf-8', (err, data) => {
+        response.writeHead(200, { 'Content-Type': 'text/css' });
+        response.write(data);
+        response.end();
+    });
+}
+const homeJs = (response, postData) => {
+    console.log('Request handler \'homeJs\' was called');
+    fs.readFile('pages/js/home.js', 'utf-8', (err, data) => {
+        response.writeHead(200, { 'Content-Type': 'text/plain' });
+        response.write(data);
+        response.end();
+    });
+}
 const chat = (response, postData) => {
     console.log('Request handler \'chat\' was called');
     fs.readFile('pages/chat.html', 'utf-8', (err, data) => {
@@ -104,7 +107,9 @@ const socket = (response, postData) => {
     });
 }
 
-exports.start = start;
+exports.home = home;
+exports.homeCss = homeCss;
+exports.homeJs = homeJs;
 exports.chat = chat;
 exports.chatCss = chatCss;
 exports.chatJs = chatJs;

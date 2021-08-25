@@ -3,8 +3,10 @@ const router = require("./router");
 const requestHandlers = require("./requestHandlers");
 
 let handle = {};
-handle['/'] = requestHandlers.start;
-handle['/start'] = requestHandlers.start;
+handle['/'] = requestHandlers.home;
+handle['/home'] = requestHandlers.home;
+handle['/css/home.css'] = requestHandlers.homeCss;
+handle['/js/home.js'] = requestHandlers.homeJs;
 handle['/chat'] = requestHandlers.chat;
 handle['/css/chat.css'] = requestHandlers.chatCss;
 handle['/js/chat.js'] = requestHandlers.chatJs;
