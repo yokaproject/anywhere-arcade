@@ -11,7 +11,7 @@ const start = (response, postData) => {
     '<body>'+
     '<h1>どこでもアーケード</h1>'+
     '<h2>Anywhere Arcade</h2>'+
-    '<a href="/slide">15パズルで遊ぶ</a><br>'+
+    '<a href="/slide">スライディング・パズルで遊ぶ</a><br>'+
     '<a href="/tetris">テトリスで遊ぶ</a><br>'+
     '<a href="/chat">チャット</a>'+
     '</body>'+
@@ -30,6 +30,22 @@ const chat = (response, postData) => {
         response.end();
     });
 }
+const chatCss = (response, postData) => {
+    console.log('Request handler \'chatCss\' was called');
+    fs.readFile('pages/css/chat.css', 'utf-8', (err, data) => {
+        response.writeHead(200, {'Content-Type': 'text/css'});
+        response.write(data);
+        response.end();
+    });
+}
+const chatJs = (response, postData) => {
+    console.log('Request handler \'chatJs\' was called');
+    fs.readFile('pages/js/chat.js', 'utf-8', (err, data) => {
+        response.writeHead(200, {'Content-Type': 'text/plain'});
+        response.write(data);
+        response.end();
+    });
+}
 const slide = (response, postData) => {
     console.log('Request handler \'slide\' was called');
     fs.readFile('pages/slide.html', 'utf-8', (err, data) => {
@@ -37,14 +53,6 @@ const slide = (response, postData) => {
         response.write(data);
         response.end();
     });
-}
-const tetris = (response, postData) => {
-    console.log('Request handler \'tetris\' was called');
-    fs.readFile('pages/tetris.html', 'utf-8', (err, data) => {
-        response.writeHead(200, {'Content-Type': 'text/html'});
-        response.write(data);
-        response.end();
-    })
 }
 const slideCss = (response, postData) => {
     console.log('Request handler \'slideCss\' was called');
@@ -61,6 +69,14 @@ const slideJs = (response, postData) => {
         response.write(data);
         response.end();
     });
+}
+const tetris = (response, postData) => {
+    console.log('Request handler \'tetris\' was called');
+    fs.readFile('pages/tetris.html', 'utf-8', (err, data) => {
+        response.writeHead(200, {'Content-Type': 'text/html'});
+        response.write(data);
+        response.end();
+    })
 }
 const tetrisCss = (response, postData) => {
     console.log('Request handler \'tetrisCss\' was called');
@@ -90,10 +106,12 @@ const socket = (response, postData) => {
 
 exports.start = start;
 exports.chat = chat;
+exports.chatCss = chatCss;
+exports.chatJs = chatJs;
 exports.slide = slide;
-exports.tetris = tetris;
 exports.slideCss = slideCss;
 exports.slideJs = slideJs;
+exports.tetris = tetris;
 exports.tetrisCss = tetrisCss;
 exports.tetrisJs = tetrisJs;
 exports.socket = socket;
