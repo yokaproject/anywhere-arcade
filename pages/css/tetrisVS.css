@@ -10,13 +10,13 @@ h1, p {
     justify-content: center;
 }
 
-.wakuA {
+.boardGrid {
     width: 20px;
     height: 20px;
     border: 1px dotted silver;
 }
 
-.wakuB {
+.blockGrid {
     width: 12px;
     height: 12px;
     border: 1px solid silver;
