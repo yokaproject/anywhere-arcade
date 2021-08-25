@@ -5,17 +5,27 @@ const requestHandlers = require("./requestHandlers");
 let handle = {};
 handle['/'] = requestHandlers.home;
 handle['/home'] = requestHandlers.home;
-handle['/css/home.css'] = requestHandlers.homeCss;
-handle['/js/home.js'] = requestHandlers.homeJs;
-handle['/chat'] = requestHandlers.chat;
-handle['/css/chat.css'] = requestHandlers.chatCss;
-handle['/js/chat.js'] = requestHandlers.chatJs;
-handle['/slide'] = requestHandlers.slide;
-handle['/css/slide.css'] = requestHandlers.slideCss;
-handle['/js/slide.js'] = requestHandlers.slideJs;
-handle['/tetris'] = requestHandlers.tetris;
-handle['/css/tetris.css'] = requestHandlers.tetrisCss;
-handle['/js/tetris.js'] = requestHandlers.tetrisJs;
-handle['/node_modules/socket.io/client-dist/socket.io.js'] = requestHandlers.socket;
+handle['/css/home.css'] = requestHandlers.getCSS;
+handle['/js/home.js'] = requestHandlers.getJS;
+
+handle['/chat'] = requestHandlers.getHTML;
+handle['/css/chat.css'] = requestHandlers.getCSS;
+handle['/js/chat.js'] = requestHandlers.getJS;
+
+handle['/slide'] = requestHandlers.getHTML;
+handle['/css/slide.css'] = requestHandlers.getCSS;
+handle['/js/slide.js'] = requestHandlers.getJS;
+
+handle['/tetris'] = requestHandlers.getHTML;
+handle['/css/tetris.css'] = requestHandlers.getCSS;
+handle['/js/tetris.js'] = requestHandlers.getJS;
+
+handle['/tetrisVS'] = requestHandlers.getHTML;
+handle['/css/tetrisVS.css'] = requestHandlers.getCSS;
+handle['/js/tetrisVS.js'] = requestHandlers.getJS;
+
+handle['/images/slide.png'] = requestHandlers.getImage;
+handle['/images/tetris.png'] = requestHandlers.getImage;
+handle['/images/chat.png'] = requestHandlers.getImage;
 
 server.start(router.route, handle);
