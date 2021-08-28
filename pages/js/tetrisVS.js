@@ -1,12 +1,25 @@
+const socket = io();
+
 // Vueオブジェクト
 const vm = new Vue({
     el: '#app',
 
     data: {
+        /* data */
+        saveData: '', // 初期状態
+        yetReachedAccessLimit: true,
+        canInvite: false,
+        invitation: 'https://anywhere-arcade.herokuapp.com/tetrisVS/',
+        roomid: '',
+
+        /* chat */
+        textInput: '',
+        messages: [],
+
         /* user config */
         width: 10, // 幅
         height: 20, // 高さ
-        speed: 0.5, // 速さ
+        speed: 0.7, // 速さ
 
         /* game info */
         player: -1,
@@ -16,7 +29,6 @@ const vm = new Vue({
         timerID: null,
         gameStarted: false,
         gameOver: false,
-        saveData: '',
 
         /* display */
         board: [], // board
@@ -92,6 +104,7 @@ const vm = new Vue({
             this.gameStarted = true;
             this.createFn(); // ブロック生成
             this.timerID = setInterval(this.fallFn, this.speed * 1000); // speed秒毎にfallFnが呼び出される
+
         },
 
         // ブロックの形を編集する
@@ -280,6 +293,9 @@ const vm = new Vue({
             clearInterval(this.timerID);
             const obj = JSON.parse(this.saveData);
             for (var k in obj) {
+                if (k === 'messages') {
+                    continue;
+                }
                 this[k] = obj[k];
             }
         },
@@ -292,6 +308,7 @@ const vm = new Vue({
                 this.comingBlock.push(tmp);
             }
         },
+
         holdFn: function() {
             this.blockMemo.forEach(v => { this.board[v[0]][v[1]] = 0 });
             this.blockMemo = [];
@@ -308,7 +325,56 @@ const vm = new Vue({
             }
             this.holdingBlock = this.blocks[this.holdingBlockType].map(v => v.slice());
         },
+
+        // send chat message
+        sendMessage() {
+            const message = this.textInput.trim();
+            this.textInput = '';
+            if (message == '') return;
+            const data = {
+                id: socket.id,
+                roomid: this.roomid,
+                isMine: false,
+                msg: message
+            }
+            socket.emit('post', data);
+
+            
+        },
     },
+    mounted() {
+        socket.on('init', (socketid) => {
+            this.invitation += socketid;
+            const roomid = document.getElementById('roomid').textContent;
+            if (roomid === 'start') {
+                this.roomid = socket.id;
+                this.canInvite = true;
+                // return;
+            } else {
+                this.roomid = roomid;
+            }
+            socket.emit('joinRoom', roomid);
+        });
+        socket.on('alertFull', () => {
+            setTimeout(() => {
+                alert('This URL has reached access limit. Please create a new game again.');
+            }, 100);
+            this.yetReachedAccessLimit = false;
+        });
+        socket.on('recievePost', (data) => {
+            const myID = socket.id;
+
+            if (data.id == myID) {
+                data.isMine = true;
+            }
+            this.messages.push(data);
+
+            if (!data.isMine && !isScrolled()) {
+                return notify();
+            }
+            setTimeout(() => { scrollToEnd(); }, 10);
+        });
+    }
 });
 
 document.onkeydown = function(e) { // キー入力
@@ -338,3 +404,28 @@ document.onkeydown = function(e) { // キー入力
     if (e.key == 'p') vm.pauseFn();
     if (e.key == 'r' && vm.gameStarted) vm.resetFn();
 };
+
+const board = document.getElementById('chatBoard');
+const isScrolled = () => {
+    const scroll = board.scrollTop + board.offsetHeight;
+    const height = board.scrollHeight;
+    return scroll === height;
+}
+const scrollToEnd = () => {
+    board.scrollTop = board.scrollHeight;
+}
+board.addEventListener('scroll', function(){
+    unnotify();
+});
+
+const notification = document.getElementById('chatNotification');
+const notify = () => {
+    notification.style.display = 'block';
+}
+const unnotify = () => {
+    notification.style.display = 'none';
+}
+notification.addEventListener('click', function(){
+    unnotify();
+    scrollToEnd();
+});

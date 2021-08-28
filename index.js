@@ -23,6 +23,8 @@ handle['/js/tetris.js'] = requestHandlers.getJS;
 handle['/tetrisVS'] = requestHandlers.getHTML;
 handle['/css/tetrisVS.css'] = requestHandlers.getCSS;
 handle['/js/tetrisVS.js'] = requestHandlers.getJS;
+handle['/tetrisVS/css/tetrisVS.css'] = requestHandlers.getCSS;
+handle['/tetrisVS/js/tetrisVS.js'] = requestHandlers.getJS;
 
 handle['/images/slide.png'] = requestHandlers.getImage;
 handle['/images/tetris.png'] = requestHandlers.getImage;
