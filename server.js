@@ -1,9 +1,19 @@
 const http = require('http');
+const socket = require('./socket');
 
 const start = (route, handle) => {
   const onRequest = (request, response) => {
-      const pathname = request.url;
-      let postData = "";
+      let pathname = request.url;
+      let postData = '';
+
+      // tetrisVSのpathnameは末尾の値にかかわらず/tetrisVSとする
+      if (pathname.indexOf('/tetrisVS/') === 0) {
+        const roomid = pathname.slice(10);
+        postData += roomid;
+        console.log(roomid);
+        pathname = '/tetrisVS';
+      }
+
       console.log('Request for ' + pathname + ' received.');
 
       request.setEncoding('utf8');
@@ -14,23 +24,15 @@ const start = (route, handle) => {
       });
 
       request.addListener('end', () => {
-        route(handle, pathname, response, postData);
+        route(handle, response, pathname, postData);
       });
   };
   
   const server = http.createServer(onRequest);
   server.listen(process.env.PORT || 3000);
   console.log('Server has started.');
-
-  const io = require('socket.io')(server);
-
-  io.on('connection', (socket)=>{
-    console.log('Connected');
   
-    socket.on('post', (msg)=>{
-      io.emit('member-post', msg);
-    });
-  });
+  socket.connect(server);
 };
 
 exports.start = start;
