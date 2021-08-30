@@ -27,7 +27,7 @@
                     <p>キーボード操作</p>
                     <p>[移動 ←↓→]<br>[回転 f]<br>[ハードドロップ ↑]<br>[ホールド s]<br>
                         [スタート space]<br>[ポーズ p]<br>[リセット r]</p>
-                    <p><input type="button" @click="startFn" value="START"></p>
+                    <p><input type="button" @click="readyFn" value="START"></p>
                     <p v-if="canInvite">招待コード：
                     <input ref="target" id="invitation" v-model="invitation" @click="$refs.target.select()"></p>
                 </div>
@@ -35,7 +35,7 @@
     
             <!-- board -->
             <div v-else="!gameStarted">
-                <p><input type="button" @click="resetFn" value="RESET"></p>
+                <!-- <p><input type="button" @click="resetFn" value="RESET"></p> -->
                 <div class="container center" v-show="!paused">
                     <div class="side">score<br>{{ score }} </div>
                     <div class="side">
@@ -57,6 +57,7 @@
                     </div>
                 </div>
                 <p v-if="paused" style="color: red;">PAUSED<br>Press P to restart.</p>
+                <p v-if="win" style="color: red;">YOU WIN!</p>
                 <p v-if="gameOver" style="color: red;">GAME OVER</p>
             </div>
         </div>
@@ -84,13 +85,12 @@
         </div>
         
         <div v-if="!yetReachedAccessLimit">
-            <p>This URL has reached access limit. Please create a new game from <a href="/tetrisVS/start">here</a>.</p>
+            <p>The owner of this game has already conncted with another user.<br>Please create a new game by clicking <a href="/tetrisVS/start">here</a>.</p>
 
         </div>
     </div>
     <script src="/socket.io/socket.io.js"></script>
-    <script src="/js/tetrisVS.js">
-    </script>
+    <script src="/js/tetrisVS.js"></script>
 </body>
 
 </html>
