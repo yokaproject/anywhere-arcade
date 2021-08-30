@@ -1,5 +1,6 @@
 const socket = io();
 
+
 // Vueオブジェクト
 const vm = new Vue({
     el: '#app',
@@ -9,8 +10,10 @@ const vm = new Vue({
         saveData: '', // 初期状態
         yetReachedAccessLimit: true,
         canInvite: false,
-        invitation: 'https://anywhere-arcade.herokuapp.com/tetrisVS/',
-        roomid: '',
+        invitation: 'https://anywhere-arcade.herokuapp.com/tetrisVS/', // heroku
+        // invitation: 'localhost:3000/tetrisVS/', // local
+        myId: '',
+        friendsId: '',
 
         /* chat */
         textInput: '',
@@ -22,6 +25,8 @@ const vm = new Vue({
         speed: 0.7, // 速さ
 
         /* game info */
+        isReady: false,
+        isReady_friend: false,
         player: -1,
         score: 0,
         edit: false,
@@ -29,6 +34,7 @@ const vm = new Vue({
         timerID: null,
         gameStarted: false,
         gameOver: false,
+        win: false,
 
         /* display */
         board: [], // board
@@ -88,23 +94,35 @@ const vm = new Vue({
                 [0, 0, 0, 0] // T
             ]
         ],
-        color: ['white', 'deepskyblue', 'gold', 'red', 'lawngreen', 'royalblue', 'darkorange', 'blueviolet', 'gray', 'black']
+        color: ['white', 'deepskyblue', 'gold', 'red', 'lawngreen', 'royalblue', 'darkorange', 'blueviolet', 'gray', 'black'],
+
+        /* attack */
+        appendRowNum: 0,
+        prevOpenColumn: -1,
     },
     
     methods: {
+        readyFn: function(){
+            if (this.friendsId === '' || this.isReady) {
+                return;
+            }
+            this.isReady = true;
+            socket.emit('isReady', this.friendsId);
+        },
+
         // ゲームスタート
         startFn: function () {
             this.saveData = JSON.stringify(this.$data); // セーブデータ?
             while (this.board.length < this.height) {
                 this.board.push('0'.repeat(this.width).split('').map(Number)); // 盤面作成
             }
-            while (this.comingBlock.length < 4) {
+            while (this.comingBlock.length < 3) {
                 this.comingBlock.push('0'.repeat(4).split('').map(Number)); // ネクストの盤面作成
             }
             this.gameStarted = true;
+
             this.createFn(); // ブロック生成
             this.timerID = setInterval(this.fallFn, this.speed * 1000); // speed秒毎にfallFnが呼び出される
-
         },
 
         // ブロックの形を編集する
@@ -192,6 +210,7 @@ const vm = new Vue({
                     if(this.block[i][j] != 0) {
                         if (this.board[i + this.blockY][j + this.blockX] != 0) { // 最上段までブロックが積まれたら終了
                             this.gameOver = true;
+                            socket.emit('endGame', this.friendsId);
                         }
                         this.board[i + this.blockY][j + this.blockX] = this.blockType + 1;
                         this.blockMemo.push([i + this.blockY, j + this.blockX]); // 操作中のブロックが盤面上で存在する位置の配列
@@ -206,6 +225,7 @@ const vm = new Vue({
 
         // ブロックの生成
         createFn: function() {
+
             if (this.block.length != 0) {
                 this.deleteFn();
             }
@@ -256,10 +276,20 @@ const vm = new Vue({
         // 揃った列を消す
         deleteFn: function () {
             this.board = this.board.filter(v => /0/.test(v.join(''))); // 盤面内の揃った列を消す
-            this.score += (this.height - this.board.length) * 100; // スコアを記録
+            const rowNum = this.height - this.board.length;
+            if (rowNum === 0) {
+                return;
+            }
+            this.score += rowNum * 100; // スコアを記録
+            // alert(rowNum);
             while (this.board.length < this.height) { // 盤面の高さを揃える
                 this.board.unshift('0'.repeat(this.width).split('').map(Number));
             }
+            const data = {
+                to: this.friendsId,
+                rowNum: rowNum
+            }
+            socket.emit('attack', data);
         },
 
         // ブロックを1マス分落とす
@@ -267,6 +297,7 @@ const vm = new Vue({
             if (this.checkFn(false, 0, 1)) {
                 this.drawFn(false, 0, 1);
             } else {
+                this.appendRow();
                 this.createFn();
             }
         },
@@ -326,6 +357,29 @@ const vm = new Vue({
             this.holdingBlock = this.blocks[this.holdingBlockType].map(v => v.slice());
         },
 
+        appendRow: function() {
+            if (this.appendRowNum === 0) {
+                return;
+            }
+            // おじゃま列の空き行をきめる
+            let openColumn = this.prevOpenColumn;
+            while (openColumn === this.prevOpenColumn) {
+                openColumn = Math.floor(Math.random() * 10);
+            }
+            this.prevOpenColumn = openColumn; // 保存
+            //おじゃま列をつくる
+            let attackRow = '8'.repeat(this.width).split('').map(Number);
+            attackRow[openColumn] = 0;
+            // おじゃま列を(appendRowNum)回挿入する
+            let i = 0;
+            while (i < this.appendRowNum) {
+                this.board.shift();
+                this.board.push(attackRow);
+                i += 1;
+            }
+            this.appendRowNum = 0; //　初期化
+        },
+
         // send chat message
         sendMessage() {
             const message = this.textInput.trim();
@@ -333,38 +387,48 @@ const vm = new Vue({
             if (message == '') return;
             const data = {
                 id: socket.id,
-                roomid: this.roomid,
+                friendsId: this.friendsId,
                 isMine: false,
                 msg: message
             }
             socket.emit('post', data);
-
-            
         },
     },
+
     mounted() {
-        socket.on('init', (socketid) => {
-            this.invitation += socketid;
-            const roomid = document.getElementById('roomid').textContent;
-            if (roomid === 'start') {
-                this.roomid = socket.id;
+        socket.on('init', () => {
+            this.myId = socket.id;
+            const friendsId = document.getElementById('friendsId').textContent;
+            if (friendsId === 'start') { // オーナー（部屋を立てたユーザ）の場合
+                this.invitation += socket.id;
                 this.canInvite = true;
-                // return;
-            } else {
-                this.roomid = roomid;
+
+            } else { //　招待されたユーザの場合
+                this.friendsId = friendsId;
+                const data = {
+                    isGuest: true,
+                    friendsId: friendsId
+                };
+                socket.emit('connectWithFriend', data);
             }
-            socket.emit('joinRoom', roomid);
         });
+        socket.on('passId', (friendsId) => { // オーナーのみ
+            this.friendsId = friendsId;
+            const data = {
+                isGuest: false,
+                friendsId: friendsId
+            };
+            socket.emit('connectWithFriend', data);
+        });
+        
         socket.on('alertFull', () => {
             setTimeout(() => {
-                alert('This URL has reached access limit. Please create a new game again.');
+                alert('Illegal access');
             }, 100);
             this.yetReachedAccessLimit = false;
         });
         socket.on('recievePost', (data) => {
-            const myID = socket.id;
-
-            if (data.id == myID) {
+            if (data.id === this.myId) {
                 data.isMine = true;
             }
             this.messages.push(data);
@@ -373,6 +437,48 @@ const vm = new Vue({
                 return notify();
             }
             setTimeout(() => { scrollToEnd(); }, 10);
+        });
+
+        socket.on('isReady_friend', (friendsId) => {
+            if (friendsId === this.myId) {
+                this.isReady_friend = true;
+            }
+            
+            // 自分も相手もisReadyの場合
+            if (this.isReady && this.isReady_friend) {
+                this.startFn();
+                return;
+            }
+
+            // 自分のみisReadyの場合
+            if (this.isReady) {
+                const data = {
+                    id: socket.id,
+                    friendsId: this.friendsId,
+                    isMine: false,
+                    msg: 'Ready!'
+                };
+                socket.emit('post', data);
+                return;
+            }
+            // 相手のみisReadyの場合
+            // alert('Your friend is ready!');
+        });
+        socket.on('addRowNum', (data) => {
+            // 攻撃先(to)が自分自身だったら処理をパス
+            if (data.to != this.myId) {
+                return;
+            }
+
+            // 挿入する列を(rowNum)増やす
+            this.appendRowNum += data.rowNum;
+        });
+        socket.on('win', (winner) => {
+            if (winner == this.myId) {
+                this.win = true;
+                clearInterval(this.timerID);
+                alert('YOU WIN!')
+            }
         });
     }
 });

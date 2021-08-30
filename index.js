@@ -28,6 +28,7 @@ handle['/tetrisVS/js/tetrisVS.js'] = requestHandlers.getJS;
 
 handle['/images/slide.png'] = requestHandlers.getImage;
 handle['/images/tetris.png'] = requestHandlers.getImage;
+handle['/images/tetrisVS.png'] = requestHandlers.getImage;
 handle['/images/chat.png'] = requestHandlers.getImage;
 
 server.start(router.route, handle);
