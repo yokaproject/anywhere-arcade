@@ -220,7 +220,7 @@ const vm = new Vue({
             if (this.gameOver) {
                 clearInterval(this.timerID);
             }
-            this.board.push();
+//             this.board.push();
         },
 
         // ブロックの生成
