@@ -299,6 +299,7 @@ const vm = new Vue({
                 this.drawFn(false, 0, 1);
             } else {
                 this.appendRow();
+                console.log(this.board); ///////////// ボードの描画 /////////////////
                 this.createFn();
             }
         },
