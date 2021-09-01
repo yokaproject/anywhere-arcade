@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
     <title>Tetris VS</title>
     <link href="https://unpkg.com/sanitize.css" rel="stylesheet">
     <link href="https://unpkg.com/sanitize.css/forms.css" rel="stylesheet">
@@ -44,8 +45,8 @@
                         </div>
                     </div>
                     <div>
-                        <div v-for="i in height" class="container">
-                            <div v-for="j in width" class="boardGrid" :style="{ backgroundColor: color[board[i-1][j-1]] }"></div>
+                        <div v-for="i in height - 2" class="container">
+                            <div v-for="j in width" class="boardGrid" :style="{ backgroundColor: color[board[i+1][j-1]] }"></div>
                         </div>
                     </div>
                     <div class="side">
