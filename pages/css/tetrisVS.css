@@ -103,7 +103,7 @@ header h1 {
     margin: 0 0 0 auto;
     background-color: darkcyan;
 }
-.others {
+.friend {
     background-color: cornflowerblue;
 }
 
@@ -134,4 +134,22 @@ header h1 {
     width: 450px;
     background-color: white;
     color: black;
+}
+
+
+@media screen and (max-width:375px) {
+    /* スマホ用 */
+    #app {
+        display: block;
+    }
+    #chat {
+        height: calc(30vh - 100px);
+        width: 100%;
+    }
+    /* #game {
+        width: 100%;
+    } */
+    #invitation {
+        max-width: 70%;
+    }
 }

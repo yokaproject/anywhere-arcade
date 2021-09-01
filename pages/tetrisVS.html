@@ -36,12 +36,12 @@
     
             <!-- board -->
             <div v-else="!gameStarted">
-                <!-- <p><input type="button" @click="resetFn" value="RESET"></p> -->
+                <p><input type="button" @click="resetFn" value="RESET"></p>
                 <div class="container center" v-show="!paused">
-                    <div class="side">score<br>{{ score }} </div>
-                    <div class="side">
+                    <div id="rightSide">
+                        <div class="side">score<br>{{ score }} </div>
                         <div v-for="i in 4" class="container">
-                            <div v-for="j in 4" class="blockGrid" :style="{ backgroundColor: color[holdingBlock[i-1][j-1]] }"></div>
+                            <div v-for="j in 4" class="blockGrid" :style="{ backgroundColor: color[holdDisplay[i-1][j-1]] }"></div>
                         </div>
                     </div>
                     <div>
@@ -50,16 +50,16 @@
                         </div>
                     </div>
                     <div class="side">
-                        <div v-for="k in 5">
+                        <div v-for="k in nextDisplayNum">
                             <div v-for="i in 4" class="container">
-                                <div v-for="j in 4" class="blockGrid" :style="{ backgroundColor: color[comingBlock[k][i-1][j-1]] }"></div>
+                                <div v-for="j in 4" class="blockGrid" :style="{ backgroundColor: color[nextDisplay[k - 1][i-1][j-1]] }"></div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <p v-if="paused" style="color: red;">PAUSED<br>Press P to restart.</p>
                 <p v-if="win" style="color: red;">YOU WIN!</p>
-                <p v-if="gameOver" style="color: red;">GAME OVER</p>
+                <p v-if="!win && gameOver" style="color: red;">GAME OVER</p>
             </div>
         </div>
 
@@ -73,7 +73,7 @@
             
             <div id="chatBoard">
                 <ul id="msglist">
-                  <li v-bind:class="{ me: message.isMine, others: !message.isMine }" v-for="message in messages">{{ message.msg }}</li>
+                  <li v-bind:class="{ me: message.isToMe, friend: !message.isToMe }" v-for="message in messages">{{ message.message }}</li>
                 </ul>
             </div>
             <div id="chatForm">
