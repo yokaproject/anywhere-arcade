@@ -9,8 +9,8 @@ const vm = new Vue({
         saveData: '', // 初期状態
         yetReachedAccessLimit: true,
         canInvite: false,
-        // invitation: 'https://anywhere-arcade.herokuapp.com/tetrisVS/', // heroku
-        invitation: 'localhost:3000/tetrisVS/', // local
+        invitation: 'https://anywhere-arcade.herokuapp.com/tetrisVS/', // heroku
+        // invitation: 'localhost:3000/tetrisVS/', // local
         myId: '',
         friendsId: '',
 
