@@ -1,0 +1,32 @@
+h1, p {
+    text-align: center;
+}
+
+.container {
+    display: flex;
+}
+
+.center {
+    justify-content: center;
+}
+
+.wakuA {
+    width: 20px;
+    height: 20px;
+    border: 1px dotted silver;
+}
+
+.wakuB {
+    width: 12px;
+    height: 12px;
+    border: 1px solid silver;
+}
+
+.side {
+    width: 100px;
+    height: 100px;
+}
+
+input[type=number] {
+    width: 80px;
+}
