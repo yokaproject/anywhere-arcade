@@ -221,6 +221,7 @@ const vm = new Vue({
                 clearInterval(this.timerID);
             }
 //             this.board.push();
+               this.player += 1;
         },
 
         // ブロックの生成
