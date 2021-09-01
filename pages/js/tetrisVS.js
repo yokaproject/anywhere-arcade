@@ -389,6 +389,15 @@ const vm = new Vue({
                         return false;
                     }
                 }
+        },
+        // ブロックを1マス分落とす
+        fallFn: function () {
+            if (this.checkFn(false, 0, 1)) {
+                this.drawFn(false, 0, 1);
+            } else {
+                this.appendRow();
+                console.log(this.board); ///////////// ボードの描画 /////////////////
+                this.createFn();
             }
             return true;
         },
