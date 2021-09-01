@@ -9,11 +9,11 @@ const connect = (server) => {
         socket.on('connectWithFriend', (data) => {
             const friendsId = data.friendsId;
             if (data.isGuest) {
-                // if (connectedUsers.has(friendsId)) {
-                //     console.log('This user has already conncted with another user.');
-                //     io.to(socket.id).emit('alertFull');
-                //     return;
-                // }
+                if (connectedUsers.has(friendsId)) {
+                    console.log('This user has already conncted with another user.');
+                    io.to(socket.id).emit('alertFull');
+                    return;
+                }
                 io.to(friendsId).emit('passId', socket.id);
             }
             socket.join(friendsId);
