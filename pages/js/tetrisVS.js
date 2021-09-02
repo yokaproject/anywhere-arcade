@@ -389,6 +389,7 @@ const vm = new Vue({
                         return false;
                     }
                 }
+            }
         },
         // ブロックを1マス分落とす
         fallFn: function () {
