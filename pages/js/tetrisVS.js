@@ -127,7 +127,7 @@ const vm = new Vue({
             clearInterval(this.timer);
             this.appendRowFn();
             this.deleteFullRowFn();
-            this.judge();
+            this.judgeFn();
 
             if (this.gameOver) {
                 return;
@@ -286,7 +286,7 @@ const vm = new Vue({
             }
         },
 
-        judge: function() {
+        judgeFn: function() {
             if (this.win) {
                 return
             }
