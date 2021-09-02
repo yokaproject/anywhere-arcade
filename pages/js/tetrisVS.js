@@ -390,8 +390,9 @@ const vm = new Vue({
                     }
                 }
             }
+            return true;
         },
-        
+
         /** ハードドロップ */
         hardDropFn: function () {
             let i = 0;
