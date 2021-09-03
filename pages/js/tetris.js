@@ -2,17 +2,24 @@
 const vm = new Vue({
     el: '#app',
     data: {
+    /* data */
+        saveData: "",
+
+    /* user config */
         W: 10, // 幅
         H: 20, // 高さ
         speed: 0.5, // 速さ
+
+    /* game info */
+        edit: false,
+        score: 0,
+        paused: false,
+        timerID: null,
+        gameStart: false,
+        gameOver: false,
+
+    /* display */
         yx: [], // board
-        block: [], //今動かしているブロック
-        blockX: 0, // X座標
-        blockY: 0, // Y座標
-        blockType: 0, // 種類
-        holdType: -1, // ホールドの種類
-        blockRotate: true, // 回転2通り用の右回転、左回転判断
-        blockMemo: [], // 今動かしているブロックの変化前の位置
         yxNext: [], // 次のブロック表示用
         yxHold: [
             [0, 0, 0, 0],
@@ -20,51 +27,55 @@ const vm = new Vue({
             [0, 0, 0, 0],
             [0, 0, 0, 0]
         ], // ホールドしているブロック表示用
+
+    /* block info */
+        block: [], //今動かしているブロック
+        blockX: 0, // X座標
+        blockY: 0, // Y座標
+        blockType: 0, // 種類
+        holdType: -1, // ホールドの種類
+        hold: false, // ホールドを使ったか
+        blockRotate: true, // 回転2通り用の右回転、左回転判断
+        blockMemo: [], // 今動かしているブロックの変化前の位置
         nextList: [], // 7個で一巡
         nextNextList: [], //
-        player: -1,
-        score: 0,
-        edit: false,
-        paused: false,
-        timerID: null,
-        gameStart: false,
-        gameOver: false,
-        saveData: "",
         blocks: [
-            [[0, 0, 0, 0],
-            [1, 1, 1, 1],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0]],   // I
-
-            [[0, 0, 0, 0],
-            [0, 2, 2, 0],
-            [0, 2, 2, 0],
-            [0, 0, 0, 0]],   // O
-
-            [[0, 0, 0, 0],
-            [0, 3, 3, 0],
-            [3, 3, 0, 0],
-            [0, 0, 0, 0]],   // S
-
-            [[0, 0, 0, 0],
-            [4, 4, 0, 0],
-            [0, 4, 4, 0],
-            [0, 0, 0, 0]],   // Z
-
-            [[0, 0, 0, 0],
-            [5, 0, 0, 0],
-            [5, 5, 5, 0],
-            [0, 0, 0, 0]],   // J
-
-            [[0, 0, 0, 0],
-            [0, 0, 6, 0],
-            [6, 6, 6, 0],
-            [0, 0, 0, 0]],   // L
-
-            [[0, 0, 0, 0],
-            [0, 7, 0, 0],
-            [7, 7, 7, 0],
-            [0, 0, 0, 0]]   // T
+            [
+                [0, 0, 0, 0],
+                [1, 1, 1, 1],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]   // I
+            ], [
+                [0, 0, 0, 0],
+                [0, 2, 2, 0],
+                [0, 2, 2, 0],
+                [0, 0, 0, 0]   // O
+            ], [
+                [0, 0, 0, 0],
+                [0, 3, 3, 0],
+                [3, 3, 0, 0],
+                [0, 0, 0, 0]   // S
+            ], [
+                [0, 0, 0, 0],
+                [4, 4, 0, 0],
+                [0, 4, 4, 0],
+                [0, 0, 0, 0]   // Z
+            ], [
+                [0, 0, 0, 0],
+                [5, 0, 0, 0],
+                [5, 5, 5, 0],
+                [0, 0, 0, 0]   // J
+            ], [
+                [0, 0, 0, 0],
+                [0, 0, 6, 0],
+                [6, 6, 6, 0],
+                [0, 0, 0, 0]   // L
+            ], [
+                [0, 0, 0, 0],
+                [0, 7, 0, 0],
+                [7, 7, 7, 0],
+                [0, 0, 0, 0]   // T
+            ]
         ],
         color: ["white", "deepskyblue", "gold", "red", "lawngreen", "royalblue", "darkorange", "blueviolet", "gray", "black"]
     },
@@ -244,6 +255,7 @@ const vm = new Vue({
                 this.drawFn(false, 0, 1);
             } else {
                 this.createFn();
+                this.hold = false;
             }
         },
 
@@ -279,6 +291,11 @@ const vm = new Vue({
             }
         },
         holdFn: function() {
+            console.log("hold" + this.hold);
+            if (this.hold) {
+                return;
+            }
+            this.hold = true;
             this.blockMemo.forEach(v => { this.yx[v[0]][v[1]] = 0 });
             this.blockMemo = [];
             if (this.holdType == -1) {
@@ -293,6 +310,7 @@ const vm = new Vue({
                 this.blockY = 1;
             }
             this.yxHold = this.blocks[this.holdType].map(v => v.slice());
+            this.drawFn(false, 0, 0);
         },
     },
 });
