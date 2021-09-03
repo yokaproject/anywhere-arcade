@@ -591,6 +591,7 @@ let startX = 0;
 let startY = 0;
 let endX = 0;
 let endY = 0;
+let count = 0;
 const setStart = (event) => {
     startX = event.touches[0].pageX;
     startY = event.touches[0].pageY;
@@ -606,22 +607,30 @@ const getDirection = () => {
     const diffY = startY - endY;
     if (diffX === 0 && diffY === 0) { // タップ
         vm.getKeyCommandFn('f');
-        console.log('tap');
+        if (!count) {
+            ++count; // タップの回数を+1
+            // 100ミリ秒以内に2回目のタップがされればダブルタップと判定
+            setTimeout(function () {
+                count = 0;
+            }, 100);
+        
+        // ダブルタップ
+        } else {
+            vm.getKeyCommandFn('s');
+            count = 0; // 回数をリセット
+        }
+
     } else if (Math.abs(diffX) > Math.abs(diffY)) { // X方向へのスワイプ
         if (diffX > 0) { // left
             vm.getKeyCommandFn('ArrowLeft');
-            console.log('left');
         } else { // right
             vm.getKeyCommandFn('ArrowRight');
-            console.log('right');
         }
     } else if (Math.abs(diffX) < Math.abs(diffY)) { // Y方向へのスワイプ
         if (diffY > 0) { // up
             vm.getKeyCommandFn('ArrowUp');
-            console.log('up');
         } else { // down
             vm.getKeyCommandFn('ArrowDown');
-            console.log('down');
         }
     }
 }
@@ -629,8 +638,6 @@ if (swipeBoard) {
     swipeBoard.addEventListener('touchstart', setStart);
     swipeBoard.addEventListener('touchmove', setEnd);
     swipeBoard.addEventListener('touchend', getDirection);
-    
-    console.log('set');
 }
 
 

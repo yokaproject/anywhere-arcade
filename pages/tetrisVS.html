@@ -23,13 +23,16 @@
         <div id="game" v-if="yetReachedAccessLimit">
             <!-- config -->
             <div v-if="!gameStarted">
-                <div>
+                <div id="rules">
                     <!-- <p>横:<input type="number" v-model="width" min="4" max="25"></p>
                     <p>縦:<input type="number" v-model="height" min="15" max="25"></p> -->
                     <!-- <p>落下間隔（秒）:<input type="number" v-model="speed" min="0.1" max="1.5" step="0.1"></p> -->
-                    <p>キーボード操作</p>
-                    <p>[移動 ←↓→]<br>[回転 f]<br>[ハードドロップ ↑]<br>[ホールド s]<br>
-                        [スタート space]<br>[ポーズ p]<br>[リセット r]</p>
+                    <h3>操作コマンド</h3>
+                    <p>移動： [←↓→] / 右・下・左スワイプ</p>
+                    <p>回転： [f] / タップ</p>
+                    <p>ハードドロップ： [↑] / 上スワイプ</p>
+                    <p>ホールド： [s] / ダブルタップ</p>
+                    <p>スタート： [space]</p>
                     <p><input type="button" @click="startFn" value="START"></p>
                     <p v-if="canInvite">招待コード：
                     <input ref="target" id="invitation" v-model="invitation" @click="$refs.target.select()"></p>
