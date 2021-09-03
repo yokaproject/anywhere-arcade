@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
+    <!-- 拡大・縮小を禁止 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Tetris VS</title>
     <link href="https://unpkg.com/sanitize.css" rel="stylesheet">
     <link href="https://unpkg.com/sanitize.css/forms.css" rel="stylesheet">
@@ -28,7 +29,7 @@
                     <p>キーボード操作</p>
                     <p>[移動 ←↓→]<br>[回転 f]<br>[ハードドロップ ↑]<br>[ホールド s]<br>
                         [スタート space]<br>[ポーズ p]<br>[リセット r]</p>
-                    <p><input type="button" @click="readyFn" value="START"></p>
+                    <p><input type="button" @click="startFn" value="START"></p>
                     <p v-if="canInvite">招待コード：
                     <input ref="target" id="invitation" v-model="invitation" @click="$refs.target.select()"></p>
                 </div>
@@ -36,31 +37,38 @@
     
             <!-- board -->
             <div v-else="!gameStarted">
-                <p><input type="button" @click="resetFn" value="RESET"></p>
-                <div class="container center" v-show="!paused">
+                <div id="gameDisplay" v-show="!paused">
                     <div id="rightSide">
-                        <div class="side">score<br>{{ score }} </div>
-                        <div v-for="i in 4" class="container">
+                        <h4>HOLD</h4>
+                        <div v-for="i in 4" class="gridContainer">
                             <div v-for="j in 4" class="blockGrid" :style="{ backgroundColor: color[holdDisplay[i-1][j-1]] }"></div>
                         </div>
+                        <h4>SCORE</h4>
+                        <p>{{ score }}</p>
                     </div>
-                    <div>
-                        <div v-for="i in height - 2" class="container">
+
+                    <div id="gameBoard">
+                        <div v-for="i in height - 2" class="gridContainer">
                             <div v-for="j in width" class="boardGrid" :style="{ backgroundColor: color[board[i+1][j-1]] }"></div>
                         </div>
                     </div>
-                    <div class="side">
+
+                    <div id="leftSide">
+                        <h4>NEXT</h4>
                         <div v-for="k in nextDisplayNum">
-                            <div v-for="i in 4" class="container">
+                            <div v-for="i in 4" class="gridContainer">
                                 <div v-for="j in 4" class="blockGrid" :style="{ backgroundColor: color[nextDisplay[k - 1][i-1][j-1]] }"></div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <p v-if="paused" style="color: red;">PAUSED<br>Press P to restart.</p>
-                <p v-if="win" style="color: red;">YOU WIN!</p>
-                <p v-if="!win && gameOver" style="color: red;">GAME OVER</p>
             </div>
+
+            <div id="swipeBoard"><p>SWIPE AREA</p></div>
+            <p v-show="paused" style="color: red;">PAUSED<br>Press P to restart.</p>
+            <p v-show="win" style="color: red;">YOU WIN!</p>
+            <p v-show="!win && gameOver" style="color: red;">GAME OVER</p>
+            <p><input v-show="gameOver" type="button" @click="resetFn" value="RESET"></p>
         </div>
 
         <!-- chat -->

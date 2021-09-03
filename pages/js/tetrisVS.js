@@ -27,7 +27,7 @@ const vm = new Vue({
         isReady: false,
         isReady_friend: false,
         player: -1,
-        score: -2000,
+        score: 0,
         edit: false,
         paused: false,
         timer: null,
@@ -118,6 +118,7 @@ const vm = new Vue({
         startFn: function () {
             this.saveData = JSON.stringify(this.$data); // 初期状態を保存
             this.height += 2;
+            this.score = this.height * (-100);
             this.gameStarted = true;
             this.dropNextBlockFn(); // ブロック生成
         },
@@ -429,7 +430,6 @@ const vm = new Vue({
             this.drawBoardFn(false, 0, 0);
         },
 
-
         /** 一時停止する */
         // pauseFn: function() {
         //     if (!this.gameOver && this.paused == false) {
@@ -448,22 +448,16 @@ const vm = new Vue({
                 return;
             }
             clearInterval(this.timer);
-            const resetData = {
-                isReady: false,
-                isReady_friend: false,
-                score: -2000,
-                gameStarted: false,
-                gameOver: false,
-                win: false
-            };
-            this.canInvite = false;
-            this.board = [];
+
+            const obj = JSON.parse(this.saveData);
+            for (var dataItem in obj) {
+                if (dataItem === 'messages') {
+                    continue;
+                }
+                this[dataItem] = obj[dataItem];
+            }
             this.isReady = false;
-            this.isReady_friend = false;
-            this.score = -2000;
-            this.gameStarted = false;
-            this.gameOver = false;
-            this.win = false;
+            console.log(this.friendsId);
         },
 
         /** ブロックの形を編集する */
@@ -591,19 +585,70 @@ document.onkeydown = function(e) {
     vm.getKeyCommandFn(e.key);
 };
 
-const board = document.getElementById('chatBoard');
+/** スワイプ入力を受け取る */
+const swipeBoard = document.getElementById('swipeBoard');
+let startX = 0;
+let startY = 0;
+let endX = 0;
+let endY = 0;
+const setStart = (event) => {
+    startX = event.touches[0].pageX;
+    startY = event.touches[0].pageY;
+    endX = event.touches[0].pageX;
+    endY = event.touches[0].pageY;
+}
+const setEnd = (event) => {
+    endX = event.touches[0].pageX;
+    endY = event.touches[0].pageY;
+}
+const getDirection = () => {
+    const diffX = startX - endX;
+    const diffY = startY - endY;
+    if (diffX === 0 && diffY === 0) { // タップ
+        vm.getKeyCommandFn('f');
+        console.log('tap');
+    } else if (Math.abs(diffX) > Math.abs(diffY)) { // X方向へのスワイプ
+        if (diffX > 0) { // left
+            vm.getKeyCommandFn('ArrowLeft');
+            console.log('left');
+        } else { // right
+            vm.getKeyCommandFn('ArrowRight');
+            console.log('right');
+        }
+    } else if (Math.abs(diffX) < Math.abs(diffY)) { // Y方向へのスワイプ
+        if (diffY > 0) { // up
+            vm.getKeyCommandFn('ArrowUp');
+            console.log('up');
+        } else { // down
+            vm.getKeyCommandFn('ArrowDown');
+            console.log('down');
+        }
+    }
+}
+if (swipeBoard) {
+    swipeBoard.addEventListener('touchstart', setStart);
+    swipeBoard.addEventListener('touchmove', setEnd);
+    swipeBoard.addEventListener('touchend', getDirection);
+    
+    console.log('set');
+}
+
+
+/** チャットのスクロール */
+const chatBoard = document.getElementById('chatBoard');
 const isScrolled = () => {
-    const scroll = board.scrollTop + board.offsetHeight;
-    const height = board.scrollHeight;
+    const scroll = chatBoard.scrollTop + chatBoard.offsetHeight;
+    const height = chatBoard.scrollHeight;
     return scroll === height;
 }
 const scrollToEnd = () => {
-    board.scrollTop = board.scrollHeight;
+    chatBoard.scrollTop = chatBoard.scrollHeight;
 }
-board.addEventListener('scroll', function(){
+chatBoard.addEventListener('scroll', function(){
     unnotify();
 });
 
+/** チャットの通知 */
 const notification = document.getElementById('chatNotification');
 const notify = () => {
     notification.style.display = 'currentBlock';
