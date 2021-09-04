@@ -67,7 +67,15 @@
                 </div>
             </div>
 
-            <div id="swipeBoard"><p>SWIPE AREA</p></div>
+            <div id="touchPad">
+                <div id="swipeBoard">
+                    <p>SWIPE AREA</p>
+                </div>
+                <div id="hold">
+                    <p>HOLD</p>
+                </div>
+            </div>
+
             <p v-show="paused" style="color: red;">PAUSED<br>Press P to restart.</p>
             <p v-show="win" style="color: red;">YOU WIN!</p>
             <p v-show="!win && gameOver" style="color: red;">GAME OVER</p>

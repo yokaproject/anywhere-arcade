@@ -607,19 +607,6 @@ const getDirection = () => {
     const diffY = startY - endY;
     if (diffX === 0 && diffY === 0) { // タップ
         vm.getKeyCommandFn('f');
-        if (!count) {
-            ++count; // タップの回数を+1
-            // 100ミリ秒以内に2回目のタップがされればダブルタップと判定
-            setTimeout(function () {
-                count = 0;
-            }, 100);
-        
-        // ダブルタップ
-        } else {
-            vm.getKeyCommandFn('s');
-            count = 0; // 回数をリセット
-        }
-
     } else if (Math.abs(diffX) > Math.abs(diffY)) { // X方向へのスワイプ
         if (diffX > 0) { // left
             vm.getKeyCommandFn('ArrowLeft');
@@ -640,6 +627,13 @@ if (swipeBoard) {
     swipeBoard.addEventListener('touchend', getDirection);
 }
 
+/** ホールドコマンドを受け取る */
+const hold = document.getElementById('hold');
+if (hold) {
+    hold.addEventListener('touchend', () => { 
+        vm.getKeyCommandFn('s'); 
+    });
+}
 
 /** チャットのスクロール */
 const chatBoard = document.getElementById('chatBoard');
