@@ -1,3 +1,7 @@
+html {
+    overscroll-behavior: none;
+}
+
 /* header */
 header {
     height: 100px;
@@ -159,6 +163,10 @@ header h1 {
     background-color: white;
     color: black;
 }
+#touchPad {
+    display: none;
+
+}
 
 /* スマホ横 / タブレット縦 / PC半分 */
 @media (max-width: 959px) {
@@ -187,17 +195,29 @@ header h1 {
     #invitation {
         max-width: 50%;
     }
-    #swipeBoard {
-        height: 90px;
+    #touchPad {
+        display: flex;
+        justify-content: space-between;
+        height: 120px;
         width: 90%;
         margin: 20px auto;
-        background-color: whitesmoke;
-        text-align: center;
     }
-    #swipeBoard p {
+    #touchPad p {
         padding-top: 10px;
         color: grey;
         font-size: 10px;
         letter-spacing: 3px;
+    }
+    #swipeBoard {
+        width: 70%;
+        background-color: whitesmoke;
+        text-align: center;
+        overscroll-behavior: contain;
+    }
+    #hold {
+        width: 25%;
+        background-color: whitesmoke;
+        text-align: center;
+        overscroll-behavior: contain;
     }
 }
