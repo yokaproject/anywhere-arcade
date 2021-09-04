@@ -609,10 +609,10 @@ const getDirection = () => {
         vm.getKeyCommandFn('f');
         if (!count) {
             ++count; // タップの回数を+1
-            // 100ミリ秒以内に2回目のタップがされればダブルタップと判定
+            // 500ミリ秒以内に2回目のタップがされればダブルタップと判定
             setTimeout(function () {
                 count = 0;
-            }, 100);
+            }, 500);
         
         // ダブルタップ
         } else {
