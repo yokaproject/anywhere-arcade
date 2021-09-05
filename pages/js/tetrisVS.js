@@ -33,6 +33,8 @@ const vm = new Vue({
         timer: null,
         gameStarted: false,
         gameOver: false,
+        level: 1,
+        isDrawing : false,
 
         /* display */
         board: [], // board
@@ -124,10 +126,11 @@ const vm = new Vue({
         },
 
         dropNextBlockFn: function() {
-            // 盤面の処理
+            // タイマーの解除
             clearInterval(this.timer);
             clearTimeout(commandTimer);
             clearTimeout(tapTimer);
+            // 盤面の処理
             this.appendRowFn();
             this.deleteFullRowFn();
             this.judgeFn();
@@ -135,13 +138,16 @@ const vm = new Vue({
             if (this.gameOver) {
                 return;
             }
+            
             // 次のブロックを落とす
-            this.changeSpeed();
+            this.changeLevel();
             this.releaseHold();
             this.createBlockFn();
             this.getNextBlockFn();
             this.drawNextBlockFn();
             this.drawBoardFn(false, 0, 0);
+
+            this.isDrawing = false;
             this.timer = setInterval(this.fallFn, this.speed * 1000); // speed秒毎にfallFnを呼び出す
         },
 
@@ -190,8 +196,14 @@ const vm = new Vue({
         },
 
         /** 速度を変える */
-        changeSpeed: function() {
-            
+        changeLevel: function() {
+            const newLevel = Math.floor(this.score / 800) + 1;
+            if (newLevel > this.level) {
+                this.level += 1;
+                if (this.speed > 0.1) {
+                    this.speed -= 0.1;
+                }
+            }
         },
 
         releaseHold: function() {
@@ -285,7 +297,10 @@ const vm = new Vue({
             if (this.checkFn(false, 0, 1)) {
                 this.drawBoardFn(false, 0, 1);
             } else {
-                this.dropNextBlockFn();
+                this.drawBoardFn(false, 0, 0);
+                this.isDrawing = true;
+                clearInterval(this.timer);
+                setTimeout(this.dropNextBlockFn, 300);
             }
         },
 
@@ -304,6 +319,9 @@ const vm = new Vue({
 
         /** キー入力を受け取る */
         getKeyCommandFn: function(key) {
+            if (this.isDrawing) {
+                return;
+            }
             switch (key) {
                 case ' ' :
                     this.readyFn(); // 開始
@@ -405,8 +423,9 @@ const vm = new Vue({
             if (i != 0) {
                 this.drawBoardFn(false, 0, i - 1);
             }
-            this.appendRowFn();
-            this.dropNextBlockFn();
+            this.isDrawing = true;
+            clearInterval(this.timer);
+            setTimeout(this.dropNextBlockFn, 300);
         },
 
         /** ホールド */
@@ -614,6 +633,7 @@ const setCommandTimer = (speed) => {
 
 // touchstart
 const setStart = (event) => {
+    event.preventDefault();
     canTap = true;
     startX = event.touches[0].pageX;
     startY = event.touches[0].pageY;
