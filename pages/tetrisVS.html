@@ -39,29 +39,31 @@
             </div>
     
             <!-- board -->
-            <div v-else="!gameStarted">
-                <div id="gameDisplay" v-show="!paused">
-                    <div id="rightSide">
-                        <h4>HOLD</h4>
+            <div id="gameDisplay" v-else="!gameStarted">
+                <div id="rightSide">
+                    <h4>HOLD</h4>
+                    <div class="blockDisplay">
                         <div v-for="i in 4" class="gridContainer">
                             <div v-for="j in 4" class="blockGrid" :style="{ backgroundColor: color[holdDisplay[i-1][j-1]] }"></div>
                         </div>
+                    </div>
+                    <div id=score>
                         <h4>SCORE</h4>
                         <p>{{ score }}</p>
                     </div>
+                </div>
 
-                    <div id="gameBoard">
-                        <div v-for="i in height - 2" class="gridContainer">
-                            <div v-for="j in width" class="boardGrid" :style="{ backgroundColor: color[board[i+1][j-1]] }"></div>
-                        </div>
+                <div id="gameBoard">
+                    <div v-for="i in height - 2" class="gridContainer">
+                        <div v-for="j in width" class="boardGrid" :style="{ backgroundColor: color[board[i+1][j-1]] }"></div>
                     </div>
+                </div>
 
-                    <div id="leftSide">
-                        <h4>NEXT</h4>
-                        <div v-for="k in nextDisplayNum">
-                            <div v-for="i in 4" class="gridContainer">
-                                <div v-for="j in 4" class="blockGrid" :style="{ backgroundColor: color[nextDisplay[k - 1][i-1][j-1]] }"></div>
-                            </div>
+                <div id="leftSide">
+                    <h4>NEXT</h4>
+                    <div class="blockDisplay" v-for="num in nextDisplayNum">
+                        <div v-for="i in 4" class="gridContainer">
+                            <div v-for="j in 4" class="blockGrid" :style="{ backgroundColor: color[nextDisplay[num-1][i-1][j-1]] }"></div>
                         </div>
                     </div>
                 </div>
