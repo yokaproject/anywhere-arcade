@@ -6,6 +6,7 @@ http://mplus-fonts.osdn.jp/mplus-bitmap-fonts/download/index.html
 */
 html {
     touch-action: manipulation;
+    overscroll-behavior: none;
 }
 body {
     overscroll-behavior: none;
@@ -83,10 +84,10 @@ header h1 {
 #rightSide {
     margin: 0 auto;
 }
-#score {
+.info {
     margin-top: 30px;
 }
-#score p {
+.info p {
     margin: 0;
 }
 #gameBoard {
@@ -227,6 +228,8 @@ header h1 {
         height: 120px;
         width: 90%;
         margin: 20px auto;
+        touch-action: manipulation;
+        overscroll-behavior: none;
     }
     #touchPad p {
         padding-top: 10px;

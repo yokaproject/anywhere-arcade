@@ -47,9 +47,13 @@
                             <div v-for="j in 4" class="blockGrid" :style="{ backgroundColor: color[holdDisplay[i-1][j-1]] }"></div>
                         </div>
                     </div>
-                    <div id=score>
+                    <div class=info>
                         <h4>SCORE</h4>
                         <p>{{ score }}</p>
+                    </div>
+                    <div class=info>
+                        <h4>LEVEL</h4>
+                        <p>{{ level }}</p>
                     </div>
                 </div>
 
