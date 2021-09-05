@@ -126,6 +126,8 @@ const vm = new Vue({
         dropNextBlockFn: function() {
             // 盤面の処理
             clearInterval(this.timer);
+            clearTimeout(swipeTimer);
+            clearTimeout(tapTimer);
             this.appendRowFn();
             this.deleteFullRowFn();
             this.judgeFn();
@@ -592,20 +594,47 @@ let startY = 0;
 let endX = 0;
 let endY = 0;
 let count = 0;
+let swipeTimer;
+let tapTimer;
+let isTap = false;
+// ハードドロップはタッチした直後のみ許可
+let canHardDrop = true;
+// 連続スワイプの反応時間
+const fastSpeed = 150;
+const middleSpeed = 200;
+const slowSpeed = 250;
+let speed = fastSpeed;
+
+// touchstart
 const setStart = (event) => {
     startX = event.touches[0].pageX;
     startY = event.touches[0].pageY;
-    endX = event.touches[0].pageX;
-    endY = event.touches[0].pageY;
+    endX = startX;
+    endY = startY;
+    speed = fastSpeed;
+
+    isTap = true;
+    tapTimer = setTimeout(() => {
+        isTap = false;
+    }, 50);
+
+    setSwipeTimer();
 }
+const setSwipeTimer = () => {
+    swipeTimer = setTimeout(() => {
+        getDirection();
+    }, speed);
+}
+// touchmove
 const setEnd = (event) => {
     endX = event.touches[0].pageX;
     endY = event.touches[0].pageY;
 }
+// touchend
 const getDirection = () => {
     const diffX = startX - endX;
     const diffY = startY - endY;
-    if (diffX === 0 && diffY === 0) { // タップ
+    if (diffX === 0 && diffY === 0 && isTap) { // タップ
         vm.getKeyCommandFn('f');
     } else if (Math.abs(diffX) > Math.abs(diffY)) { // X方向へのスワイプ
         if (diffX > 0) { // left
@@ -614,17 +643,40 @@ const getDirection = () => {
             vm.getKeyCommandFn('ArrowRight');
         }
     } else if (Math.abs(diffX) < Math.abs(diffY)) { // Y方向へのスワイプ
-        if (diffY > 0) { // up
-            vm.getKeyCommandFn('ArrowUp');
-        } else { // down
+        if (diffY < 0) { // down
             vm.getKeyCommandFn('ArrowDown');
+            endSwipe();
+            return;
+
+        } else if (canHardDrop) { // up
+            console.log('hard drop');
+            vm.getKeyCommandFn('ArrowUp');
+        } else {
+            console.log('no more hard drop');
         }
     }
+    console.log(diffX + ' ' + diffY);
+    canHardDrop = false;
+    
+    setSwipeTimer();
+}
+
+const endSwipe = () => {
+    clearTimeout(swipeTimer);
+    clearTimeout(tapTimer);
+    if (isTap) {
+        vm.getKeyCommandFn('f');
+    }
+    isTap = false;
+    canHardDrop = true;
 }
 if (swipeBoard) {
     swipeBoard.addEventListener('touchstart', setStart);
     swipeBoard.addEventListener('touchmove', setEnd);
-    swipeBoard.addEventListener('touchend', getDirection);
+    swipeBoard.addEventListener('touchend', () => {
+        endSwipe();
+        console.log('touchend-------------')
+    });
 }
 
 /** ホールドコマンドを受け取る */

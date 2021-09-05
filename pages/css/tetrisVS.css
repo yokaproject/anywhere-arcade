@@ -1,5 +1,19 @@
-html {
+/*
+http://mplus-fonts.osdn.jp/mplus-bitmap-fonts/download/index.html
+
+
+
+*/
+
+body {
     overscroll-behavior: none;
+
+}
+body h1, h2, h3, h4, h5, h6, p {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', 'Hiragino Sans', sans-serif;
+}
+body input {
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 /* header */
@@ -37,6 +51,8 @@ header h1 {
     text-align: center;
 }
 #game h4{
+    margin-top: 0;
+    margin-bottom: 6px;
     text-align: center;
     font-size: 12px;
 }
@@ -51,8 +67,7 @@ header h1 {
     margin-top: 20px;
 }
 .blockDisplay {
-    display: flex;
-    margin-bottom: 2px;
+    margin-bottom: 10px;
 }
 .boardGrid {
     width: 24px;
@@ -66,7 +81,12 @@ header h1 {
 }
 #rightSide {
     margin: 0 auto;
-    
+}
+#score {
+    margin-top: 30px;
+}
+#score p {
+    margin: 0;
 }
 #gameBoard {
     margin: 0;
@@ -175,11 +195,15 @@ header h1 {
 
 /* スマホ縦 */
 @media (max-width: 519px) {
+    /* レイアウト */
     header {
         display: none;
     }
     #app {
         display: block;
+    }
+    #rules p {
+        font-size: 12px;
     }
     #chat {
         display: none;
@@ -195,6 +219,7 @@ header h1 {
     #invitation {
         max-width: 50%;
     }
+    /* スワイプ入力 */
     #touchPad {
         display: flex;
         justify-content: space-between;
@@ -207,17 +232,16 @@ header h1 {
         color: grey;
         font-size: 10px;
         letter-spacing: 3px;
+        user-select: none;
     }
     #swipeBoard {
         width: 70%;
         background-color: whitesmoke;
         text-align: center;
-        overscroll-behavior: contain;
     }
     #hold {
         width: 25%;
         background-color: whitesmoke;
         text-align: center;
-        overscroll-behavior: contain;
     }
 }
