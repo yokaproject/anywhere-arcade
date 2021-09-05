@@ -5,7 +5,6 @@
     <meta charset="utf-8">
     <!-- 拡大・縮小を禁止 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
     <title>Tetris VS</title>
     <link href="https://unpkg.com/sanitize.css" rel="stylesheet">
     <link href="https://unpkg.com/sanitize.css/forms.css" rel="stylesheet">
@@ -33,7 +32,7 @@
                     <p>ハードドロップ： [↑] / 上スワイプ</p>
                     <p>ホールド： [s] / ダブルタップ</p>
                     <p>スタート： [space]</p>
-                    <p><input type="button" @click="readyFn" value="START"></p>
+                    <p><input type="button" @click="startFn" value="START"></p>
                     <p v-if="canInvite">招待コード：
                     <input ref="target" id="invitation" v-model="invitation" @click="$refs.target.select()"></p>
                 </div>
