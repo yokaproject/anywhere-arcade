@@ -1,54 +1,98 @@
 const connect = (server) => {
     const io = require('socket.io')(server);
-    let connectedUsers = new Set();
+
+    let rooms = {}; // ルームIDとそのクライアント数を格納する辞書型配列
 
     io.on('connection', (socket) => {
-        console.log('Connected');
+
+        const myId = socket.id;
+        let myRoomId = '';
+
         socket.emit('init');
 
-        socket.on('connectWithFriend', (data) => {
-            const friendsId = data.friendsId;
-            if (data.isGuest) {
-                if (connectedUsers.has(friendsId)) {
-                    console.log('This user has already conncted with another user.');
-                    io.to(socket.id).emit('alertFull');
+        // オーナーの場合
+        socket.on('makeRoom', () => {
+
+            // ランダムな文字列を生成し、roomIdとして設定
+            const { nanoid } = require('nanoid');
+            const roomId = nanoid();
+            console.log('Created room ' + roomId);
+            
+            // roomsに新しいキーを追加
+            rooms[roomId] = 0;
+            console.log(rooms);
+            
+            socket.emit('setInvitationUrl', roomId);
+        });
+
+        socket.on('joinRoom', (roomId) => {
+
+            // その時点での部屋の入室状況によって判断
+            switch (rooms[roomId]) {
+                case 0:
+                case 1:
+                    // console.log('able to join');
+                    break;
+                case 2:
+                    // console.log('room is full');
+                    io.to(socket.id).emit('alertIllegalness', 1);
                     return;
-                }
-                io.to(friendsId).emit('passId', socket.id);
+                default:
+                    // console.log('illegal room');
+                    io.to(socket.id).emit('alertIllegalness', 0);
+                    return;
             }
-            socket.join(friendsId);
-            connectedUsers.add(friendsId);
-            console.log('isGuest: ' + data.isGuest);
-            console.log(socket.rooms);
 
-            socket.on('post', (data) => {
-                io.to(data.to).emit('recievePost', data);
+            // 入室可能な場合
+            myRoomId = roomId;
+            rooms[myRoomId] += 1;
+            socket.join(myRoomId);
+
+            // ユーザー2人が入室したら、接続完了を双方へ通知
+            if (rooms[myRoomId] === 2) {
+                io.to(myRoomId).emit('alertConnection');
+            }
+
+            // 待機通知
+            socket.on('sendRequest', (roomId, senderId) => {
+                io.to(roomId).emit('recieveRequest', senderId);
             });
-    
-            socket.on('isReady', (friendsId) => {
-                console.log('is ready called by ' + socket.id);
-                console.log('called friend is ready for ' + friendsId);
-                io.to(friendsId).emit('isReady_friend', friendsId);
+            
+            // メッセージ
+            socket.on('sendMessage', (roomId, messageData) => {
+                io.to(roomId).emit('recieveMessage', messageData);
             });
 
-            socket.on('attack', (data) => {
-                io.to(data.to).emit('addRowNum', data);
+            // 攻撃
+            socket.on('sendAttack', (roomId, attackData) => {
+                io.to(roomId).emit('recieveAttack', attackData);
             });
-            socket.on('endGame', (winner) => {
-                io.to(winner).emit('win', winner);
+
+            socket.on('sendSurrender', (roomId) => {
+                io.to(roomId).emit('recieveSurrender');
             });
+
+            socket.on('sendCanReplay', (roomId, senderId) => {
+                io.to(roomId).emit('recieveCanReplay', senderId);
+            });
+
         });
         
-        socket.on('disconnect', (socket) => {
-            console.log('Disconnected');
-            const id = socket.id;
-            if (connectedUsers.has(id)) {
-                connectedUsers.delete(id);
-                console.log('deleted' + id);
+        socket.on('disconnect', () => {
+            // 表示用
+            console.log(myId + ' disconnected and leaving room ' + myRoomId);
+
+            // 入室している部屋がなければ処理を終了
+            if (myRoomId === '') {
+                return;
             }
-            console.log('Current connected users: ' + connectedUsers.size);
-            for (var userId of connectedUsers) {
-                console.log('- ' + userId);
+
+            // 部屋リストのデータを変更
+            rooms[myRoomId] -= 1;
+            if (rooms[myRoomId]) {
+                io.to(myRoomId).emit('alertDisconnection');
+            } else {
+                delete rooms[myRoomId];
             }
         });
     });
