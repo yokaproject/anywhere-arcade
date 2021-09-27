@@ -30,10 +30,13 @@
                     <p>移動： [←↓→] / 右・下・左スワイプ</p>
                     <p>回転： [f] / タップ</p>
                     <p>ハードドロップ： [↑] / 上スワイプ</p>
-                    <p>ホールド： [s] / ダブルタップ</p>
-                    <p>スタート： [space]</p>
-                    <p><input type="button" @click="startFn" value="START"></p>
-                    <p v-if="canInvite">招待コード：
+                    <p>ホールド： [s] / ホールドボタン</p>
+                    <p>スタート： [space] / ボタン</p>
+                    <p>
+                        <input v-if="solo" type="button" @click="startFn" value="SOLO">
+                        <input v-else="solo" type="button" @click="readyFn" value="PLAY">
+                    </p>
+                    <p>招待コード：
                     <input ref="target" id="invitation" v-model="invitation" @click="$refs.target.select()"></p>
                 </div>
             </div>
@@ -85,7 +88,8 @@
             <p v-show="paused" style="color: red;">PAUSED<br>Press P to restart.</p>
             <p v-show="win" style="color: red;">YOU WIN!</p>
             <p v-show="!win && gameOver" style="color: red;">GAME OVER</p>
-            <p><input v-show="gameOver" type="button" @click="resetFn" value="RESET"></p>
+            <p><input v-show="gameOver" type="button" @click="resetFn" value="REPLAY"></p>
+            <p><input v-show="gameStarted && !gameOver" type="button" @click="quitFn" value="QUIT"></p>
         </div>
 
         <!-- chat -->

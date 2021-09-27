@@ -8,33 +8,37 @@ const vm = new Vue({
         /* data */
         saveData: '', // 初期状態
         yetReachedAccessLimit: true,
-        canInvite: false,
-        invitation: 'https://anywhere-arcade.herokuapp.com/tetrisVS/', // heroku
-        // invitation: 'localhost:3000/tetrisVS/', // local
-        myId: '',
-        friendsId: '',
+        // invitation: 'https://anywhere-arcade.herokuapp.com/tetrisVS/', // heroku
+        invitation: 'localhost:3000/tetrisVS/', // local
 
-        /* chat */
+        /** socket */
+        roomId: '',
+        myId: '',
+        isConnected: false,
+        isReady: false,
+        isRequested: false,
+        canReplay: true,
+
+        /* chat data */
         textInput: '',
         messages: [],
 
         /* user config */
         width: 10, // 幅
         height: 20, // 高さ
-        speed: 0.5, // 速さ
+        speed: 0.4, // 速さ
+        solo: false,
 
         /* game info */
-        isReady: false,
-        isReady_friend: false,
-        player: -1,
         score: 0,
-        edit: false,
-        paused: false,
         timer: null,
         gameStarted: false,
         gameOver: false,
         level: 1,
         isDrawing : false,
+        paused: false,
+        // edit: false,
+        // player: -1,
 
         /* display */
         board: [], // board
@@ -109,15 +113,25 @@ const vm = new Vue({
         /** 準備完了 */
         readyFn: function(){
             // 相手が未アクセスの場合と、すでにSTARTした場合は処理をスキップ
-            if (this.friendsId === '' || this.isReady) {
+            if (!this.isConnected) {
+                console.log('Your friend has yet joined.');
+                return;
+            }
+            if (this.isReady) {
+                console.log('You already sent request.');
+                return;
+            }
+            if (!this.canReplay) {
+                console.log('Your friend has yet returned.');
                 return;
             }
             this.isReady = true;
-            socket.emit('isReady', this.friendsId);
+            socket.emit('sendRequest', this.roomId, this.myId);
         },
 
         /** ゲーム開始 */
         startFn: function () {
+            this.canReplay = false;
             this.saveData = JSON.stringify(this.$data); // 初期状態を保存
             this.height += 2;
             this.score = this.height * (-100);
@@ -188,20 +202,20 @@ const vm = new Vue({
             while (this.board.length < this.height) { // 盤面の高さを揃える
                 this.board.unshift('0'.repeat(this.width).split('').map(Number));
             }
-            const data = {
-                to: this.friendsId,
+            const attackData = {
+                senderId: this.myId,
                 rowNum: rowNum
             }
-            socket.emit('attack', data);
+            socket.emit('sendAttack', this.roomId, attackData);
         },
 
-        /** 速度を変える */
+        /** レベルと速度を変える */
         changeLevel: function() {
             const newLevel = Math.floor(this.score / 800) + 1;
             if (newLevel > this.level) {
                 this.level += 1;
                 if (this.speed > 0.1) {
-                    this.speed -= 0.1;
+                    this.speed -= 0.05;
                 }
             }
         },
@@ -311,11 +325,10 @@ const vm = new Vue({
             for (let judgeLine of this.board[1]) {
                 if (judgeLine > 0) { // 最上段までブロックが積まれたら終了
                     this.gameOver = true;
-                    socket.emit('endGame', this.friendsId);
+                    socket.emit('sendSurrender', this.roomId, this.myId);
                 }
             }
         },
-
 
         /** キー入力を受け取る */
         getKeyCommandFn: function(key) {
@@ -468,17 +481,35 @@ const vm = new Vue({
             if (!this.gameOver) {
                 return;
             }
-            clearInterval(this.timer);
-
-            const obj = JSON.parse(this.saveData);
-            for (var dataItem in obj) {
-                if (dataItem === 'messages') {
+            // データを復元
+            const dataObject = JSON.parse(this.saveData);
+            for (let dataItem in dataObject) {
+                if (dataItem === 'messages' || dataItem === 'canReplay') {
                     continue;
                 }
-                this[dataItem] = obj[dataItem];
+                this[dataItem] = dataObject[dataItem];
             }
             this.isReady = false;
-            console.log(this.friendsId);
+            this.isRequested = false;
+            this.invitation += '';
+
+            socket.emit('sendCanReplay', this.roomId, this.myId);
+        },
+
+        /** 途中終了 */
+        quitFn: function () {
+            if (confirm('Are you sure you want to quit the game?')) {
+                this.gameOver = true;
+                // タイマーの解除
+                clearInterval(this.timer);
+                clearTimeout(commandTimer);
+                clearTimeout(tapTimer);
+                socket.emit('sendSurrender', this.roomId, this.myId);
+
+                setTimeout(() => {
+                    this.resetFn();
+                }, 10);
+            }
         },
 
         /** ブロックの形を編集する */
@@ -490,97 +521,115 @@ const vm = new Vue({
             const message = this.textInput.trim();
             this.textInput = '';
             if (message == '') return;
-            const data = {
-                to: this.friendsId,
-                isToMe: true,
-                message: message
+
+            const messageData = {
+                senderId: this.myId,
+                message: message,
+                isToMe: false
             }
-            socket.emit('post', data);
+            socket.emit('sendMessage', this.roomId, messageData);
         },
     },
 
     mounted() {
         /** socketと接続された際に初期化する */
         socket.on('init', () => {
-            this.myId = socket.id;
-            const friendsId = document.getElementById('friendsId').textContent;
-            if (friendsId === 'start') { // オーナー（部屋を立てたユーザ）の場合
-                this.invitation += socket.id;
-                this.canInvite = true;
+            console.log('initialize');
+            this.myId = socket.id; // クライアント自身のsocket idを取得
+            console.log(this.myId);
+            const roomId = document.getElementById('roomId').textContent; // HTMLからroom idを取得
+            let data = {};
 
+            if (roomId === 'solo') { // ソロプレイの場合
+                this.solo = true;
+            } else if (roomId === 'start') { // オーナー（部屋を立てたユーザ）の場合
+                socket.emit('makeRoom');
             } else { //　招待されたユーザの場合
-                this.friendsId = friendsId;
-                const data = {
-                    isGuest: true,
-                    friendsId: friendsId
-                };
-                socket.emit('connectWithFriend', data);
+                this.roomId = roomId;
+                this.invitation += roomId;
+                socket.emit('joinRoom', roomId);
             }
         });
-        /** オーナーがゲストから送信されたidを受け取る */
-        socket.on('passId', (friendsId) => { // オーナーのみ
-            this.friendsId = friendsId;
-            const data = {
-                isGuest: false,
-                friendsId: friendsId
-            };
-            socket.emit('connectWithFriend', data);
+
+        socket.on('setInvitationUrl', (roomId) => {
+            this.roomId = roomId;
+            this.invitation += roomId;
+
+            socket.emit('joinRoom', roomId);
         });
+
         /** 入室制限を通知する */
-        socket.on('alertFull', () => {
+        socket.on('alertIllegalness', (state) => {
             setTimeout(() => {
-                alert('Illegal access');
+                if (state) {
+                    alert('The room is full.');
+                } else {
+                    alert('The room doesn\'t exist.');
+                }
             }, 100);
             this.yetReachedAccessLimit = false;
         });
-        /** チャットメッセージを受け取る */
-        socket.on('recievePost', (data) => {
-            if (data.to === this.myId) {
-                data.isToMe = false;
-            }
-            this.messages.push(data);
 
-            if (data.isToMe && !isScrolled()) {
+        /** ユーザーが2人接続したことを確認する */
+        socket.on('alertConnection', () => {
+            this.isConnected = true;
+        })
+
+        /** ユーザーが退室したことを確認する */
+        socket.on('alertDisconnection', () => {
+            this.isConnected = false;
+            this.canReplay = true;
+            alert('Your friend left the room.');
+        })
+
+        /** 相手の準備完了報告を受け取る */
+        socket.on('recieveRequest', (senderId) => {
+            if (senderId != this.myId) {
+                this.isRequested = true;
+            }
+            // 自分も相手もisReadyの場合
+            if (this.isReady && this.isRequested) {
+                this.startFn();
+                return;
+            }
+            // 自分のみisReadyの場合
+            if (this.isReady) {
+                const messageData = {
+                    senderId: this.myId,
+                    message: 'Ready!',
+                    isToMe: false
+                }
+                socket.emit('sendMessage', this.roomId, messageData);
+                return;
+            }
+        });
+
+        /** チャットメッセージを受け取る */
+        socket.on('recieveMessage', (messageData) => {
+            if (messageData.senderId === this.myId) {
+                messageData.isToMe = true;
+            }
+            this.messages.push(messageData);
+            console.log('Recieved a new msg!');
+
+            if (messageData.isToMe && !isScrolled()) {
                 return notify();
             }
             setTimeout(() => { scrollToEnd(); }, 10);
         });
-        /** 相手の準備完了報告を受け取る */
-        socket.on('isReady_friend', (friendsId) => {
-            if (friendsId === this.myId) {
-                this.isReady_friend = true;
-            }
-            
-            // 自分も相手もisReadyの場合
-            if (this.isReady && this.isReady_friend) {
-                this.startFn();
-                return;
-            }
 
-            // 自分のみisReadyの場合
-            if (this.isReady) {
-                const data = {
-                    to: this.friendsId,
-                    isToMe: true,
-                    message: 'Ready!'
-                };
-                socket.emit('post', data);
-                return;
-            }
-            // 相手のみisReadyの場合
-            // alert('Your friend is ready!');
-        });
         /** 攻撃されたときの処理を行う */
-        socket.on('addRowNum', (data) => {
-            // 攻撃先(to)が自分でなけれら処理をパス
-            if (data.to != this.myId) {
+        socket.on('recieveAttack', (attackData) => {
+            // 攻撃者(to)が自分であれば処理をパス
+            if (attackData.senderId === this.myId) {
                 return;
             }
             // 挿入する列を(rowNum)増やす
-            this.appendRowNum += data.rowNum;
+            this.appendRowNum += attackData.rowNum;
         });
+
         /** 勝利を通知する */
-        socket.on('win', (winner) => {
+        socket.on('recieveSurrender', () => {
             if (this.gameOver) {
                 return;
             }
@@ -590,9 +639,16 @@ const vm = new Vue({
             this.win = true;
             this.winNum += 1;
         });
+
+        /** ゲームの再開を許可 */
+        socket.on('recieveCanReplay', (senderId) => {
+            if (senderId === this.myId) {
+                return;
+            }
+            this.canReplay = true;
+        });
     }
 });
-
 
 ////　ここからはドキュメント自体に対する関数
 

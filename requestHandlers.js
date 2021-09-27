@@ -15,7 +15,7 @@ const getHTML = (response, pathname, postData) => {
     const file = 'pages' + pathname + '.html';
     fs.readFile(file, 'utf-8', (err, filedata) => {
         response.writeHead(200, {'Content-Type': 'text/html'});
-        response.write('<span id="friendsId" style="display: none;">' + postData + '</span>');
+        response.write('<span id="roomId" style="display: none;">' + postData + '</span>');
         response.write(filedata);
         response.end();
     })
