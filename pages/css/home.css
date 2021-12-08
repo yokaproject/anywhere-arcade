@@ -1,10 +1,27 @@
+/* Webフォント読み込み */
+@import url('https://fonts.googleapis.com/css2?family=Yusei+Magic&display=swap');
+
+
+body {
+    font-size: 62.5%;
+    font-family: 'Yusei Magic', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6, a, p, li {
+    margin: 0;
+    padding: 0;
+}
 header {
-    font-size: 50px;
-    height: 100px;
-    text-align: center;
-    margin: auto;
+    /* height: 100px; */
+    /* margin: auto; */
     background-color: brown;
-    color: burlywood;
+}
+
+h1 {
+    padding: 2rem 2.5rem;
+    font-size: 3rem;
+    font-weight: 600;
+    color: #ffffff;
 }
 
 .left-button {
@@ -26,16 +43,16 @@ header {
 }
 
 .wrapper {
-    border: solid;
     width: 800px;
     height: 600px;
     text-align: center;
-    margin: auto;
+    margin: 5rem auto;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     align-items: baseline;
     align-content: center;
+    background-color: #555555;
 }
 
 .container {
@@ -50,7 +67,17 @@ header {
 }
 
 .game-icon {
-    margin: 5vh auto;
+    margin: 3rem;
     width: 100px;
     height: 100px;
+    opacity: 0.75;
+}
+
+.game-icon a {
+    font-size: 1.4rem;
+    color: #ffffff;
+}
+
+.game-icon:hover {
+    opacity: 1;
 }
