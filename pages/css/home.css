@@ -24,6 +24,12 @@ h1 {
     color: #ffffff;
 }
 
+h2 {
+    padding-top: 2rem;
+    font-size: 2rem;
+    text-align: center;
+}
+
 .left-button {
     width: 0;
     height: 0;
