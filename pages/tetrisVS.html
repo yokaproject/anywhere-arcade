@@ -2,125 +2,124 @@
 <html lang="ja">
 
 <head>
-    <meta charset="utf-8">
-    <!-- 拡大・縮小を禁止 -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tetris VS</title>
-    <link href="https://unpkg.com/sanitize.css" rel="stylesheet">
-    <link href="https://unpkg.com/sanitize.css/forms.css" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="/css/tetrisVS.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.0.7/vue.min.js"></script>
+  <meta charset="utf-8">
+  <!-- 拡大・縮小を禁止 -->
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Tetris VS</title>
+  <link href="https://unpkg.com/sanitize.css" rel="stylesheet">
+  <link href="https://unpkg.com/sanitize.css/forms.css" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="/css/tetrisVS.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.0.7/vue.min.js"></script>
 </head>
 
 <body>
-    <header>
-        <h1>Tetris VS</h1>
-    </header>
+  <header>
+    <h1>Tetris VS</h1>
+  </header>
 
-    <div id="app">
-        <!-- game -->
-        <div id="game" v-if="yetReachedAccessLimit">
-            <!-- config -->
-            <div v-if="!gameStarted">
-                <div id="rules">
-                    <!-- <p>横:<input type="number" v-model="width" min="4" max="25"></p>
+  <div id="app">
+    <!-- game -->
+    <div id="game" v-if="yetReachedAccessLimit">
+      <!-- config -->
+      <div v-if="!gameStarted">
+        <div id="rules" class="rules">
+          <!-- <p>横:<input type="number" v-model="width" min="4" max="25"></p>
                     <p>縦:<input type="number" v-model="height" min="15" max="25"></p> -->
-                    <!-- <p>落下間隔（秒）:<input type="number" v-model="speed" min="0.1" max="1.5" step="0.1"></p> -->
-                    <h3>操作コマンド</h3>
-                    <p>移動： [←↓→] / 右・下・左スワイプ</p>
-                    <p>回転： [f] / タップ</p>
-                    <p>ハードドロップ： [↑] / 上スワイプ</p>
-                    <p>ホールド： [s] / ホールドボタン</p>
-                    <p>スタート： [space] / ボタン</p>
-                    <p>
-                        <input v-if="solo" type="button" @click="startFn" value="SOLO">
-                        <input v-else="solo" type="button" @click="readyFn" value="PLAY">
-                    </p>
-                    <p>招待コード：
-                    <input ref="target" id="invitation" v-model="invitation" @click="$refs.target.select()"></p>
-                </div>
+          <!-- <p>落下間隔（秒）:<input type="number" v-model="speed" min="0.1" max="1.5" step="0.1"></p> -->
+          <h3>操作コマンド</h3>
+          <p>移動： [←↓→] / 右・下・左スワイプ</p>
+          <p>回転： [f] / タップ</p>
+          <p>ハードドロップ： [↑] / 上スワイプ</p>
+          <p>ホールド： [s] / ホールドボタン</p>
+          <p>スタート： [space] / ボタン</p>
+          <p>
+            <input v-if="solo" type="button" @click="startFn" value="SOLO">
+            <input v-else="solo" type="button" @click="readyFn" value="PLAY">
+          </p>
+          <p>招待コード：
+            <input ref="target" id="invitation" v-model="invitation" @click="$refs.target.select()">
+          </p>
+        </div>
+      </div>
+
+      <!-- board -->
+      <div id="gameDisplay" class="vue-display" v-else="!gameStarted">
+        <div id="rightSide">
+          <h4>HOLD</h4>
+          <div class="blockDisplay">
+            <div v-for="i in 4" class="gridContainer">
+              <div v-for="j in 4" class="blockGrid" :style="{ backgroundColor: color[holdDisplay[i-1][j-1]] }"></div>
             </div>
-    
-            <!-- board -->
-            <div id="gameDisplay" v-else="!gameStarted">
-                <div id="rightSide">
-                    <h4>HOLD</h4>
-                    <div class="blockDisplay">
-                        <div v-for="i in 4" class="gridContainer">
-                            <div v-for="j in 4" class="blockGrid" :style="{ backgroundColor: color[holdDisplay[i-1][j-1]] }"></div>
-                        </div>
-                    </div>
-                    <div class=info>
-                        <h4>SCORE</h4>
-                        <p>{{ score }}</p>
-                    </div>
-                    <div class=info>
-                        <h4>LEVEL</h4>
-                        <p>{{ level }}</p>
-                    </div>
-                </div>
-
-                <div id="gameBoard">
-                    <div v-for="i in height - 2" class="gridContainer">
-                        <div v-for="j in width" class="boardGrid" :style="{ backgroundColor: color[board[i+1][j-1]] }"></div>
-                    </div>
-                </div>
-
-                <div id="leftSide">
-                    <h4>NEXT</h4>
-                    <div class="blockDisplay" v-for="num in nextDisplayNum">
-                        <div v-for="i in 4" class="gridContainer">
-                            <div v-for="j in 4" class="blockGrid" :style="{ backgroundColor: color[nextDisplay[num-1][i-1][j-1]] }"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="touchPad">
-                <div id="swipeBoard">
-                    <p>SWIPE AREA</p>
-                </div>
-                <div id="hold">
-                    <p>HOLD</p>
-                </div>
-            </div>
-
-            <p v-show="paused" style="color: red;">PAUSED<br>Press P to restart.</p>
-            <p v-show="win" style="color: red;">YOU WIN!</p>
-            <p v-show="!win && gameOver" style="color: red;">GAME OVER</p>
-            <p><input v-show="gameOver" type="button" @click="resetFn" value="REPLAY"></p>
-            <p><input v-show="gameStarted && !gameOver" type="button" @click="quitFn" value="QUIT"></p>
+          </div>
+          <div class=info>
+            <h4>SCORE</h4>
+            <p>{{ score }}</p>
+          </div>
+          <div class=info>
+            <h4>LEVEL</h4>
+            <p>{{ level }}</p>
+          </div>
         </div>
 
-        <!-- chat -->
-        <div id="chat" v-if="yetReachedAccessLimit">
-            <div id="chatTitle">
-                <h3>Chat</h3>
-                <div id="chatNotification">New message ↓</div>
-            </div>
-
-            
-            <div id="chatBoard">
-                <ul id="msglist">
-                  <li v-bind:class="{ me: message.isToMe, friend: !message.isToMe }" v-for="message in messages">{{ message.message }}</li>
-                </ul>
-            </div>
-            <div id="chatForm">
-                <form id="postform">
-                    <input type="text" id="msg" v-model="textInput">
-                    <button v-on:click.prevent="sendMessage">Send</button>
-                </form>
-            </div>
-
+        <div id="gameBoard">
+          <div v-for="i in height - 2" class="gridContainer">
+            <div v-for="j in width" class="boardGrid" :style="{ backgroundColor: color[board[i+1][j-1]] }"></div>
+          </div>
         </div>
-        
-        <div v-if="!yetReachedAccessLimit">
-            <p>The owner of this game has already conncted with another user.<br>Please create a new game by clicking <a href="/tetrisVS/start">here</a>.</p>
 
+        <div id="leftSide">
+          <h4>NEXT</h4>
+          <div class="blockDisplay" v-for="num in nextDisplayNum">
+            <div v-for="i in 4" class="gridContainer">
+              <div v-for="j in 4" class="blockGrid" :style="{ backgroundColor: color[nextDisplay[num-1][i-1][j-1]] }">
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
+
+      <div id="js-swipeBoard" class="swipe-board"></div>
+      <div id="js-holdBoard" class="hold-board"></div>
+
+      <p v-show="paused" style="color: red;">PAUSED<br>Press P to restart.</p>
+      <p v-show="win" style="color: red;">YOU WIN!</p>
+      <p v-show="!win && gameOver" style="color: red;">GAME OVER</p>
+      <p><input v-show="gameOver" type="button" @click="resetFn" value="REPLAY"></p>
+      <p><input v-show="gameStarted && !gameOver" type="button" @click="quitFn" value="QUIT"></p>
     </div>
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="/js/tetrisVS.js"></script>
+
+    <!-- chat -->
+    <div id="chat" v-if="yetReachedAccessLimit">
+      <div id="chatTitle">
+        <h3>Chat</h3>
+        <div id="chatNotification">New message ↓</div>
+      </div>
+
+
+      <div id="chatBoard">
+        <ul id="msglist">
+          <li v-bind:class="{ me: message.isToMe, friend: !message.isToMe }" v-for="message in messages">{{
+            message.message }}</li>
+        </ul>
+      </div>
+      <div id="chatForm">
+        <form id="postform">
+          <input type="text" id="msg" v-model="textInput">
+          <button v-on:click.prevent="sendMessage">Send</button>
+        </form>
+      </div>
+
+    </div>
+
+    <div v-if="!yetReachedAccessLimit">
+      <p>The owner of this game has already conncted with another user.<br>Please create a new game by clicking <a
+          href="/tetrisVS/start">here</a>.</p>
+
+    </div>
+  </div>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/tetrisVS.js"></script>
 </body>
 
 </html>

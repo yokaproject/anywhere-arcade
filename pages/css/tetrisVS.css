@@ -1,192 +1,190 @@
 /*
 http://mplus-fonts.osdn.jp/mplus-bitmap-fonts/download/index.html
-
-
-
 */
+
 html {
-    touch-action: manipulation;
-    overscroll-behavior: none;
+  touch-action: manipulation;
+  overscroll-behavior: none;
 }
 body {
-    overscroll-behavior: none;
+  overscroll-behavior: none;
 }
 body h1, h2, h3, h4, h5, h6, p {
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', 'Hiragino Sans', sans-serif;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', 'Hiragino Sans', sans-serif;
 }
 body input {
-    font-family: Arial, Helvetica, sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 /* header */
 header {
-    height: 100px;
-    background-color: dimgray;
-    text-align: center;
+  height: 100px;
+  background-color: dimgray;
+  text-align: center;
 }
 header h1 {
-    margin: 0;
-    color: white;
-    line-height: 100px;
+  margin: 0;
+  color: white;
+  line-height: 100px;
 }
 
 /* app */
 #app {
-    display: flex;
+  display: flex;
 }
 #chat {
-    min-height: calc(100vh - 100px);
-    width: 30%;
-    color: white;
-    background-color: darkgrey;
+  min-height: calc(100vh - 100px);
+  width: 30%;
+  color: white;
+  background-color: darkgrey;
 }
 #game {
-    margin: auto;
-    width: 70%;
+  margin: auto;
+  width: 70%;
 }
 
 /* game */
 #game p{
-    text-align: center;
+  text-align: center;
 }
 #game h3{
-    text-align: center;
+  text-align: center;
 }
 #game h4{
-    margin-top: 0;
-    margin-bottom: 6px;
-    text-align: center;
-    font-size: 12px;
+  margin-top: 0;
+  margin-bottom: 6px;
+  text-align: center;
+  font-size: 12px;
 }
 #rules {
-    margin-top: 20px;
+  margin-top: 20px;
 }
 .gridContainer {
-    display: flex;
+  display: flex;
 }
 #gameDisplay {
-    display: flex;
-    margin-top: 20px;
+  display: flex;
+  margin-top: 20px;
 }
 .blockDisplay {
-    margin-bottom: 10px;
+  margin-bottom: 10px;
 }
 .boardGrid {
-    width: 24px;
-    height: 24px;
-    border: 1px dotted silver;
+  width: 24px;
+  height: 24px;
+  border: 1px dotted silver;
 }
 .blockGrid {
-    width: 12px;
-    height: 12px;
-    border: 1px dotted silver;
+  width: 12px;
+  height: 12px;
+  border: 1px dotted silver;
 }
 #rightSide {
-    margin: 0 auto;
+  margin: 0 auto;
 }
 .info {
-    margin-top: 30px;
+  margin-top: 30px;
 }
 .info p {
-    margin: 0;
+  margin: 0;
 }
 #gameBoard {
-    margin: 0;
-    
+  margin: 0;
+  
 }
 #leftSide {
-    margin: 0 auto;
-    
+  margin: 0 auto;
+  
 }
 
 #game input[type=number] {
-    width: 80px;
+  width: 80px;
 }
 
 /* chat */
 #chatTitle {
-    position: relative;
-    margin: 0;
-    height: 70px;
-    display: flex;
-    align-items: center;
+  position: relative;
+  margin: 0;
+  height: 70px;
+  display: flex;
+  align-items: center;
 }
 #chatTitle h3 {
-    max-height: 50px;
-    text-align: center;
-    margin: 0 auto;
+  max-height: 50px;
+  text-align: center;
+  margin: 0 auto;
 }
 
 #chatBoard {
-    margin: 0 auto;
-    padding: 15px 15px 7px 15px;
-    width: 80%;
-    height: calc(100vh - 250px);
-    background-color: white;
-    overflow: scroll;
+  margin: 0 auto;
+  padding: 15px 15px 7px 15px;
+  width: 80%;
+  height: calc(100vh - 250px);
+  background-color: white;
+  overflow: scroll;
 }
 #chatNotification {
-    position: absolute;
-    top: 70px;
-    right: 10%;
-    width: 80%;
-    padding: 9px;
-    background-color: lightsalmon;
-    display: none;
-    text-align: center;
-    line-height: 12px;
-    color: black;
+  position: absolute;
+  top: 70px;
+  right: 10%;
+  width: 80%;
+  padding: 9px;
+  background-color: lightsalmon;
+  display: none;
+  text-align: center;
+  line-height: 12px;
+  color: black;
 }
 #msglist {
-    margin: 0;
-    padding-left: 0;
-    list-style: none;
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
 }
 #msglist li {
-    margin-bottom: 8px;
-    padding: 4px 10px;
-    max-width: 80%;
-    width: fit-content;
-    border-radius: 7px;
+  margin-bottom: 8px;
+  padding: 4px 10px;
+  max-width: 80%;
+  width: fit-content;
+  border-radius: 7px;
 }
 .me {
-    margin: 0 0 0 auto;
-    background-color: darkcyan;
+  margin: 0 0 0 auto;
+  background-color: darkcyan;
 }
 .friend {
-    background-color: cornflowerblue;
+  background-color: cornflowerblue;
 }
 
 #chatForm {
-    height: 80px;
-    display: flex;
-    align-items: center;
+  height: 80px;
+  display: flex;
+  align-items: center;
 }
 #postform {
-    width: 80%;
-    margin: auto;
-    display: flex;
-    justify-content: space-between;
+  width: 80%;
+  margin: auto;
+  display: flex;
+  justify-content: space-between;
 }
 #postform input {
-    width: calc(100% - 70px);
-    background-color: white;
-    color: black;
-    /* margin-right: 5%; */
+  width: calc(100% - 70px);
+  background-color: white;
+  color: black;
+  /* margin-right: 5%; */
 }
 #postform button {
-    background-color: white;
-    color: darkgray;
-    min-width: 65px;
+  background-color: white;
+  color: darkgray;
+  min-width: 65px;
 }
 
 #invitation {
-    width: 450px;
-    background-color: white;
-    color: black;
+  width: 450px;
+  background-color: white;
+  color: black;
 }
 #touchPad {
-    display: none;
+  display: none;
 
 }
 
@@ -197,55 +195,70 @@ header h1 {
 
 /* スマホ縦 */
 @media (max-width: 519px) {
-    /* レイアウト */
-    header {
-        display: none;
-    }
-    #app {
-        display: block;
-    }
-    #rules p {
-        font-size: 12px;
-    }
-    #chat {
-        display: none;
-    }
-    #game {
-        width: 100%;
-    }
-    .boardGrid {
-        width: 22px;
-        height: 22px;
-        border: 1px dotted silver;
-    }
-    #invitation {
-        max-width: 50%;
-    }
-    /* スワイプ入力 */
-    #touchPad {
-        display: flex;
-        justify-content: space-between;
-        height: 120px;
-        width: 90%;
-        margin: 20px auto;
-        touch-action: manipulation;
-        overscroll-behavior: none;
-    }
-    #touchPad p {
-        padding-top: 10px;
-        color: grey;
-        font-size: 10px;
-        letter-spacing: 3px;
-        user-select: none;
-    }
-    #swipeBoard {
-        width: 70%;
-        background-color: whitesmoke;
-        text-align: center;
-    }
-    #hold {
-        width: 25%;
-        background-color: whitesmoke;
-        text-align: center;
-    }
+  /* レイアウト */
+  header {
+    display: none;
+  }
+  #app {
+    display: block;
+  }
+  #rules p {
+    font-size: 12px;
+  }
+  #chat {
+    display: none;
+  }
+  #game {
+    width: 100%;
+  }
+  .boardGrid {
+    width: 22px;
+    height: 22px;
+    border: 1px dotted silver;
+  }
+  #invitation {
+    max-width: 50%;
+  }
+  /* スワイプ入力 */
+  #touchPad {
+    display: flex;
+    justify-content: space-between;
+    height: 120px;
+    width: 90%;
+    margin: 20px auto;
+    touch-action: manipulation;
+    overscroll-behavior: none;
+  }
+  #touchPad p {
+    padding-top: 10px;
+    color: grey;
+    font-size: 10px;
+    letter-spacing: 3px;
+    user-select: none;
+  }
+  #swipeBoard {
+    width: 70%;
+    background-color: whitesmoke;
+    text-align: center;
+  }
+  .rules {
+    position: relative;
+    z-index: 10;
+  }
+  .swipe-board {
+    position: absolute;
+    top: 20px;
+    left: 78px;
+    width: 221px;
+    height: 440px;
+    z-index: 1;
+  }
+  .hold-board {
+    position: absolute;
+    top: 44px;
+    left: 15px;
+    width: 48px;
+    height: 48px;
+    z-index: 1;
+  }
 }
