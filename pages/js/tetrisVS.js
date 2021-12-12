@@ -154,7 +154,7 @@ const vm = new Vue({
       }
 
       // 次のブロックを落とす
-      this.changeLevel();
+      this.updateLevel();
       this.releaseHold();
       this.createBlockFn();
       this.getNextBlockFn();
@@ -209,14 +209,19 @@ const vm = new Vue({
       socket.emit('sendAttack', this.roomId, attackData);
     },
 
-    /** レベルと速度を変える */
-    changeLevel: function () {
-      const newLevel = Math.floor(this.score / 800) + 1;
-      if (newLevel > this.level) {
+
+    updateLevel: function () {
+      /* initial level = 1, score increases at most 400 */
+      const requiredScore = this.level * 800;
+      if (this.score >= requiredScore) {
         this.level += 1;
-        if (this.speed > 0.1) {
-          this.speed -= 0.05;
-        }
+        this.changeSpeed();
+      }
+    },
+
+    changeSpeed: function () {
+      if (this.speed > 0.1) {
+        this.speed -= 0.05;
       }
     },
 
