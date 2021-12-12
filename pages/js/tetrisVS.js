@@ -154,7 +154,7 @@ const vm = new Vue({
       }
 
       // 次のブロックを落とす
-      this.changeLevel();
+      this.updateLevel();
       this.releaseHold();
       this.createBlockFn();
       this.getNextBlockFn();
