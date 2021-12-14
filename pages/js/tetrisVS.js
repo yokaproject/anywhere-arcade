@@ -5,13 +5,13 @@ const vm = new Vue({
   el: '#app',
 
   data: {
-    /* data */
+    /* general data */
     saveData: '', // 初期状態
     yetReachedAccessLimit: true,
-    invitation: 'https://anywhere-arcade.herokuapp.com/tetrisVS/', // heroku
-    //         invitation: 'localhost:3000/tetrisVS/', // local
+    invitationLink: 'https://anywhere-arcade.herokuapp.com/tetrisVS/', // heroku
+    //         invitationLink: 'localhost:3000/tetrisVS/', // local
 
-    /** socket */
+    /** socket data */
     roomId: '',
     myId: '',
     isConnected: false,
@@ -23,22 +23,20 @@ const vm = new Vue({
     textInput: '',
     messages: [],
 
-    /* user config */
+    /* game config */
     width: 10, // 幅
     height: 20, // 高さ
-    speed: 0.4, // 速さ
     solo: false,
 
-    /* game info */
+    /* game state */
     score: 0,
-    timer: null,
-    gameStarted: false,
-    gameOver: false,
     level: 1,
+    speed: 0.4,
+    timer: null,
+    isStarted: false,
+    isOver: false,
+    isPaused: false,
     isDrawing: false,
-    paused: false,
-    // edit: false,
-    // player: -1,
 
     /* display */
     board: [], // board
@@ -52,7 +50,7 @@ const vm = new Vue({
     ], // ホールドしているブロック表示用
     hold: { can: true, firstTime: true },
 
-    /* currentBlock info */
+    /* block data */
     currentBlock: [], //今動かしているブロック
     blockX: 0, // X座標
     blockY: 0, // Y座標
@@ -60,8 +58,7 @@ const vm = new Vue({
     holdingBlockType: -1, // ホールドの種類
     blockRotate: true, // 回転2通り用の右回転、左回転判断
     blockMemo: [], // 今動かしているブロックの変化前の位置
-    nextBlocks: [], // 7個で一巡
-    nextPendingBlockList: [],
+    nextBlockTypes: [],
     blocks: [
       [
         [0, 0, 0, 0],
@@ -100,7 +97,7 @@ const vm = new Vue({
         [0, 0, 0, 0] // T
       ]
     ],
-    color: ['white', 'deepskyblue', 'gold', 'red', 'lawngreen', 'royalblue', 'darkorange', 'blueviolet', 'gray', 'black'],
+    colors: ['white', 'deepskyblue', 'gold', 'red', 'lawngreen', 'royalblue', 'darkorange', 'blueviolet', 'gray', 'black'],
 
     /* attack */
     appendRowNum: 0,
@@ -135,7 +132,7 @@ const vm = new Vue({
       this.saveData = JSON.stringify(this.$data); // 初期状態を保存
       this.height += 2;
       this.score = this.height * (-100);
-      this.gameStarted = true;
+      this.isStarted = true;
       this.dropNextBlockFn(); // ブロック生成
     },
 
@@ -149,7 +146,7 @@ const vm = new Vue({
       this.deleteFullRowFn();
       this.judgeFn();
 
-      if (this.gameOver) {
+      if (this.isOver) {
         return;
       }
 
@@ -236,7 +233,7 @@ const vm = new Vue({
     /** ブロックを生成する */
     createBlockFn: function () {
       // 待機ブロックが表示する数より少なくなったら
-      if (this.nextBlocks.length <= this.nextDisplayNum) {
+      if (this.nextBlockTypes.length <= this.nextDisplayNum) {
         let blockNums = this.blocks.length; // ブロックの種類数
         // 0から(ブロックの種類数-1)までの数が順に格納された配列を作成
         let shuffledBlocks = Array.from({ length: blockNums }).map((_, index) => index);
@@ -246,13 +243,13 @@ const vm = new Vue({
           [shuffledBlocks[i], shuffledBlocks[j]] = [shuffledBlocks[j], shuffledBlocks[i]];
         }
         // nextBlocksの末尾にshuffledBlocksを追加する
-        this.nextBlocks = this.nextBlocks.concat(shuffledBlocks);
+        this.nextBlockTypes = this.nextBlockTypes.concat(shuffledBlocks);
       }
     },
 
     getNextBlockFn: function () {
       this.blockMemo = []; // 現在操作中のブロックを消す
-      this.currentBlockType = this.nextBlocks.shift();
+      this.currentBlockType = this.nextBlockTypes.shift();
       this.currentBlock = this.blocks[this.currentBlockType].map(v => v.slice());
       // 位置の初期化
       this.blockY = -1;
@@ -265,13 +262,13 @@ const vm = new Vue({
       // 初期状態から
       if (this.nextDisplay.length === 0) {
         for (let i = 0; i < this.nextDisplayNum; i++) {
-          this.nextDisplay.push(this.blocks[this.nextBlocks[i]].map(v => v.slice()));
+          this.nextDisplay.push(this.blocks[this.nextBlockTypes[i]].map(v => v.slice()));
         }
         return;
       }
       // 先頭の要素を消して、最後尾に追加
       this.nextDisplay.shift();
-      this.nextDisplay.push(this.blocks[this.nextBlocks[this.nextDisplayNum - 1]].map(v => v.slice()));
+      this.nextDisplay.push(this.blocks[this.nextBlockTypes[this.nextDisplayNum - 1]].map(v => v.slice()));
       return;
     },
 
@@ -329,7 +326,7 @@ const vm = new Vue({
       }
       for (let judgeLine of this.board[1]) {
         if (judgeLine > 0) { // 最上段までブロックが積まれたら終了
-          this.gameOver = true;
+          this.isOver = true;
           socket.emit('sendSurrender', this.roomId, this.myId);
         }
       }
@@ -352,7 +349,7 @@ const vm = new Vue({
           break;
         default:
           // スタート前、ポーズ中、ゲーム終了後はブロックの操作を禁止
-          if (!this.gameStarted || this.paused || this.gameOver) {
+          if (!this.isStarted || this.isPaused || this.isOver) {
             return;
           }
           let rotate = false; // 回転の有無
@@ -471,19 +468,19 @@ const vm = new Vue({
 
     /** 一時停止する */
     // pauseFn: function() {
-    //     if (!this.gameOver && this.paused == false) {
-    //         this.paused = true;
+    //     if (!this.isOver && this.isPaused == false) {
+    //         this.isPaused = true;
     //         clearInterval(this.timer);
 
-    //     } else if (!this.gameOver && this.paused == true) {
-    //         this.paused = false;
+    //     } else if (!this.isOver && this.isPaused == true) {
+    //         this.isPaused = false;
     //         this.timer = setInterval(this.fallFn, this.speed * 1000); // speed秒毎にfallFnが呼び出される
     //     }
     // },
 
     /** リセット */
     resetFn: function () {
-      if (!this.gameOver) {
+      if (!this.isOver) {
         return;
       }
       // データを復元
@@ -496,7 +493,7 @@ const vm = new Vue({
       }
       this.isReady = false;
       this.isRequested = false;
-      this.invitation += '';
+      this.invitationLink += '';
 
       socket.emit('sendCanReplay', this.roomId, this.myId);
     },
@@ -504,7 +501,7 @@ const vm = new Vue({
     /** 途中終了 */
     quitFn: function () {
       if (confirm('Are you sure you want to quit the game?')) {
-        this.gameOver = true;
+        this.isOver = true;
         // タイマーの解除
         clearInterval(this.timer);
         clearTimeout(commandTimer);
@@ -551,14 +548,14 @@ const vm = new Vue({
         socket.emit('makeRoom');
       } else { //　招待されたユーザの場合
         this.roomId = roomId;
-        this.invitation += roomId;
+        this.invitationLink += roomId;
         socket.emit('joinRoom', roomId);
       }
     });
 
     socket.on('setInvitationUrl', (roomId) => {
       this.roomId = roomId;
-      this.invitation += roomId;
+      this.invitationLink += roomId;
 
       socket.emit('joinRoom', roomId);
     });
@@ -635,12 +632,12 @@ const vm = new Vue({
 
     /** 勝利を通知する */
     socket.on('recieveSurrender', () => {
-      if (this.gameOver) {
+      if (this.isOver) {
         return;
       }
       alert('YOU WIN!');
       clearInterval(this.timer);
-      this.gameOver = true;
+      this.isOver = true;
       this.win = true;
       this.winNum += 1;
     });

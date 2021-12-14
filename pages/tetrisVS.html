@@ -49,7 +49,7 @@
           <h4>HOLD</h4>
           <div class="blockDisplay">
             <div v-for="i in 4" class="gridContainer">
-              <div v-for="j in 4" class="blockGrid" :style="{ backgroundColor: color[holdDisplay[i-1][j-1]] }"></div>
+              <div v-for="j in 4" class="blockGrid" :style="{ backgroundColor: colors[holdDisplay[i-1][j-1]] }"></div>
             </div>
           </div>
           <div class=info>
@@ -64,7 +64,7 @@
 
         <div id="gameBoard">
           <div v-for="i in height - 2" class="gridContainer">
-            <div v-for="j in width" class="boardGrid" :style="{ backgroundColor: color[board[i+1][j-1]] }"></div>
+            <div v-for="j in width" class="boardGrid" :style="{ backgroundColor: colors[board[i+1][j-1]] }"></div>
           </div>
         </div>
 
@@ -72,7 +72,7 @@
           <h4>NEXT</h4>
           <div class="blockDisplay" v-for="num in nextDisplayNum">
             <div v-for="i in 4" class="gridContainer">
-              <div v-for="j in 4" class="blockGrid" :style="{ backgroundColor: color[nextDisplay[num-1][i-1][j-1]] }">
+              <div v-for="j in 4" class="blockGrid" :style="{ backgroundColor: colors[nextDisplay[num-1][i-1][j-1]] }">
               </div>
             </div>
           </div>
